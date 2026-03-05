@@ -1,0 +1,1930 @@
+{
+  "meta": {
+    "generated": "2026-03-05",
+    "wcag_version": "2.2",
+    "sources": {
+      "act_rules": "https://www.w3.org/WAI/standards-guidelines/act/rules/data/rules.json",
+      "arrm": "https://raw.githubusercontent.com/w3c/wai-arrm/draft/_data/arrm/arrm-all-tasks.csv",
+      "axe_core": "https://github.com/dequelabs/axe-core/blob/develop/doc/rule-descriptions.md",
+      "alfa": "https://github.com/siteimprove/alfa/blob/main/packages/alfa-rules/README.md"
+    }
+  },
+  "success_criteria": {
+    "1.1.1": {
+      "title": "Non-text Content",
+      "level": "A",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/non-text-content.html",
+      "automation": {
+        "act": [
+          "23a2a8",
+          "3ea0c8",
+          "59796f",
+          "9eb3f6",
+          "a25f45",
+          "c3232f",
+          "de46e4"
+        ],
+        "axe": [
+          "area-alt",
+          "image-alt",
+          "input-image-alt",
+          "object-alt",
+          "role-img-alt",
+          "svg-img-alt",
+          "input-button-name"
+        ],
+        "alfa": [
+          "SIA-R2",
+          "SIA-R3",
+          "SIA-R25",
+          "SIA-R26",
+          "SIA-R41"
+        ]
+      },
+      "manual": {
+        "roles": [
+          "Content Authoring",
+          "Front-End Development",
+          "UX Design"
+        ],
+        "tt_steps": [
+          "1.1.1.A - Image: Meaningful",
+          "1.1.1.B - Image: Decorative",
+          "1.1.1.C - Image: Functional",
+          "1.1.1.D - Image: Text",
+          "1.1.1.E - Audio/Video Alternative"
+        ]
+      }
+    },
+    "1.2.1": {
+      "title": "Audio-only and Video-only (Prerecorded)",
+      "level": "A",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/audio-only-and-video-only-prerecorded.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Content Authoring",
+          "UX Design"
+        ],
+        "tt_steps": [
+          "1.2.1.A - Audio-only Alternative",
+          "1.2.1.B - Video-only Alternative"
+        ]
+      }
+    },
+    "1.2.2": {
+      "title": "Captions (Prerecorded)",
+      "level": "A",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/captions-prerecorded.html",
+      "automation": {
+        "act": [
+          "eac66b"
+        ],
+        "axe": [
+          "video-caption"
+        ],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Content Authoring"
+        ],
+        "tt_steps": [
+          "1.2.2.A - Captions Accuracy and Synchronization",
+          "1.2.2.B - Captions Completeness"
+        ]
+      }
+    },
+    "1.2.3": {
+      "title": "Audio Description or Media Alternative (Prerecorded)",
+      "level": "A",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/audio-description-or-media-alternative-prerecorded.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Content Authoring"
+        ],
+        "tt_steps": [
+          "1.2.3.A - Audio Description or Media Alternative"
+        ]
+      }
+    },
+    "1.2.4": {
+      "title": "Captions (Live)",
+      "level": "AA",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/captions-live.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Content Authoring"
+        ],
+        "tt_steps": [
+          "1.2.4.A - Live Captions Accuracy"
+        ]
+      }
+    },
+    "1.2.5": {
+      "title": "Audio Description (Prerecorded)",
+      "level": "AA",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/audio-description-prerecorded.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Content Authoring"
+        ],
+        "tt_steps": [
+          "1.2.5.A - Audio Description Completeness"
+        ]
+      }
+    },
+    "1.2.6": {
+      "title": "Sign Language (Prerecorded)",
+      "level": "AAA",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/sign-language-prerecorded.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Content Authoring"
+        ],
+        "tt_steps": [
+          "1.2.6.A - Sign Language Interpretation"
+        ]
+      }
+    },
+    "1.2.7": {
+      "title": "Extended Audio Description (Prerecorded)",
+      "level": "AAA",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/extended-audio-description-prerecorded.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Content Authoring"
+        ],
+        "tt_steps": [
+          "1.2.7.A - Extended Audio Description"
+        ]
+      }
+    },
+    "1.2.8": {
+      "title": "Media Alternative (Prerecorded)",
+      "level": "AAA",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/media-alternative-prerecorded.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Content Authoring"
+        ],
+        "tt_steps": [
+          "1.2.8.A - Full Media Alternative"
+        ]
+      }
+    },
+    "1.2.9": {
+      "title": "Audio-only (Live)",
+      "level": "AAA",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/audio-only-live.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Content Authoring"
+        ],
+        "tt_steps": [
+          "1.2.9.A - Live Audio Alternative"
+        ]
+      }
+    },
+    "1.3.1": {
+      "title": "Info and Relationships",
+      "level": "A",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/info-and-relationships.html",
+      "automation": {
+        "act": [
+          "307n5z",
+          "3e12e1",
+          "674b10",
+          "78fd32",
+          "7d6734",
+          "b49b2e",
+          "d0f69e",
+          "d9e9d9",
+          "eba20a",
+          "f51b46"
+        ],
+        "axe": [
+          "definition-list",
+          "dlitem",
+          "list",
+          "listitem",
+          "landmark-one-main",
+          "table-duplicate-name",
+          "td-headers-attr",
+          "th-has-data-cells"
+        ],
+        "alfa": [
+          "SIA-R1",
+          "SIA-R4",
+          "SIA-R7",
+          "SIA-R13",
+          "SIA-R16",
+          "SIA-R39",
+          "SIA-R53"
+        ]
+      },
+      "manual": {
+        "roles": [
+          "Front-End Development",
+          "Content Authoring",
+          "UX Design"
+        ],
+        "tt_steps": [
+          "1.3.1.A - Meaningful Sequence in Code",
+          "1.3.1.B - Data Table Structure",
+          "1.3.1.C - List Structure",
+          "1.3.1.D - Headings and Labels"
+        ]
+      }
+    },
+    "1.3.2": {
+      "title": "Meaningful Sequence",
+      "level": "A",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/meaningful-sequence.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Front-End Development",
+          "UX Design"
+        ],
+        "tt_steps": [
+          "1.3.2.A - Reading and Navigation Order"
+        ]
+      }
+    },
+    "1.3.3": {
+      "title": "Sensory Characteristics",
+      "level": "A",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/sensory-characteristics.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Content Authoring",
+          "UX Design"
+        ],
+        "tt_steps": [
+          "1.3.3.A - Instructions Without Sensory Reliance"
+        ]
+      }
+    },
+    "1.3.4": {
+      "title": "Orientation",
+      "level": "AA",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/orientation.html",
+      "automation": {
+        "act": [
+          "b33eff"
+        ],
+        "axe": [
+          "css-orientation-lock"
+        ],
+        "alfa": [
+          "SIA-R9"
+        ]
+      },
+      "manual": {
+        "roles": [
+          "Front-End Development",
+          "UX Design"
+        ],
+        "tt_steps": [
+          "1.3.4.A - Orientation Lock Restriction"
+        ]
+      }
+    },
+    "1.3.5": {
+      "title": "Identify Input Purpose",
+      "level": "AA",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/identify-input-purpose.html",
+      "automation": {
+        "act": [
+          "135hje"
+        ],
+        "axe": [
+          "autocomplete-valid"
+        ],
+        "alfa": [
+          "SIA-R8"
+        ]
+      },
+      "manual": {
+        "roles": [
+          "Front-End Development"
+        ],
+        "tt_steps": [
+          "1.3.5.A - Autocomplete Attribute on Personal Data Fields"
+        ]
+      }
+    },
+    "1.3.6": {
+      "title": "Identify Purpose",
+      "level": "AAA",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/identify-purpose.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Front-End Development",
+          "UX Design"
+        ],
+        "tt_steps": [
+          "1.3.6.A - Semantic Markup for UI Components"
+        ]
+      }
+    },
+    "1.4.1": {
+      "title": "Use of Color",
+      "level": "A",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/use-of-color.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Visual Design",
+          "Content Authoring"
+        ],
+        "tt_steps": [
+          "1.4.1.A - Color Not Used as Sole Means"
+        ]
+      }
+    },
+    "1.4.2": {
+      "title": "Audio Control",
+      "level": "A",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/audio-control.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Front-End Development",
+          "UX Design"
+        ],
+        "tt_steps": [
+          "1.4.2.A - Auto-Playing Audio Mechanism"
+        ]
+      }
+    },
+    "1.4.3": {
+      "title": "Contrast (Minimum)",
+      "level": "AA",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html",
+      "automation": {
+        "act": [
+          "09o5cg",
+          "afw4f7"
+        ],
+        "axe": [
+          "color-contrast"
+        ],
+        "alfa": [
+          "SIA-R69"
+        ]
+      },
+      "manual": {
+        "roles": [
+          "Visual Design"
+        ],
+        "tt_steps": [
+          "1.4.3.A - Text Contrast Ratio 4.5:1",
+          "1.4.3.B - Large Text Contrast Ratio 3:1"
+        ]
+      }
+    },
+    "1.4.4": {
+      "title": "Resize Text",
+      "level": "AA",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/resize-text.html",
+      "automation": {
+        "act": [],
+        "axe": [
+          "meta-viewport"
+        ],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Front-End Development",
+          "Visual Design"
+        ],
+        "tt_steps": [
+          "1.4.4.A - Text Resize to 200%"
+        ]
+      }
+    },
+    "1.4.5": {
+      "title": "Images of Text",
+      "level": "AA",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/images-of-text.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Visual Design",
+          "Content Authoring"
+        ],
+        "tt_steps": [
+          "1.4.5.A - Images of Text Avoidance"
+        ]
+      }
+    },
+    "1.4.6": {
+      "title": "Contrast (Enhanced)",
+      "level": "AAA",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/contrast-enhanced.html",
+      "automation": {
+        "act": [],
+        "axe": [
+          "color-contrast-enhanced"
+        ],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Visual Design"
+        ],
+        "tt_steps": [
+          "1.4.6.A - Text Contrast Ratio 7:1",
+          "1.4.6.B - Large Text Contrast Ratio 4.5:1"
+        ]
+      }
+    },
+    "1.4.7": {
+      "title": "Low or No Background Audio",
+      "level": "AAA",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/low-or-no-background-audio.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Content Authoring"
+        ],
+        "tt_steps": [
+          "1.4.7.A - Background Audio Level"
+        ]
+      }
+    },
+    "1.4.8": {
+      "title": "Visual Presentation",
+      "level": "AAA",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/visual-presentation.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Visual Design",
+          "Front-End Development"
+        ],
+        "tt_steps": [
+          "1.4.8.A - Text Block Formatting Controls"
+        ]
+      }
+    },
+    "1.4.9": {
+      "title": "Images of Text (No Exception)",
+      "level": "AAA",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/images-of-text-no-exception.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Visual Design"
+        ],
+        "tt_steps": [
+          "1.4.9.A - Pure Images of Text"
+        ]
+      }
+    },
+    "1.4.10": {
+      "title": "Reflow",
+      "level": "AA",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/reflow.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Front-End Development",
+          "Visual Design"
+        ],
+        "tt_steps": [
+          "1.4.10.A - Content Reflow at 320px Width"
+        ]
+      }
+    },
+    "1.4.11": {
+      "title": "Non-text Contrast",
+      "level": "AA",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html",
+      "automation": {
+        "act": [
+          "4c31df"
+        ],
+        "axe": [
+          "non-text-color-contrast"
+        ],
+        "alfa": [
+          "SIA-R70"
+        ]
+      },
+      "manual": {
+        "roles": [
+          "Visual Design"
+        ],
+        "tt_steps": [
+          "1.4.11.A - UI Component Contrast 3:1",
+          "1.4.11.B - Graphical Object Contrast"
+        ]
+      }
+    },
+    "1.4.12": {
+      "title": "Text Spacing",
+      "level": "AA",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/text-spacing.html",
+      "automation": {
+        "act": [
+          "9e45ec"
+        ],
+        "axe": [],
+        "alfa": [
+          "SIA-R86"
+        ]
+      },
+      "manual": {
+        "roles": [
+          "Front-End Development",
+          "Visual Design"
+        ],
+        "tt_steps": [
+          "1.4.12.A - Text Spacing Override"
+        ]
+      }
+    },
+    "1.4.13": {
+      "title": "Content on Hover or Focus",
+      "level": "AA",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/content-on-hover-or-focus.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Front-End Development",
+          "UX Design"
+        ],
+        "tt_steps": [
+          "1.4.13.A - Hoverable Tooltip Dismissal",
+          "1.4.13.B - Tooltip Persistence"
+        ]
+      }
+    },
+    "2.1.1": {
+      "title": "Keyboard",
+      "level": "A",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/keyboard.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Front-End Development",
+          "UX Design"
+        ],
+        "tt_steps": [
+          "2.1.1.A - Keyboard Access to All Functionality",
+          "2.1.1.B - Custom Keyboard Interactions"
+        ]
+      }
+    },
+    "2.1.2": {
+      "title": "No Keyboard Trap",
+      "level": "A",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/no-keyboard-trap.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Front-End Development"
+        ],
+        "tt_steps": [
+          "2.1.2.A - Keyboard Trap Detection"
+        ]
+      }
+    },
+    "2.1.3": {
+      "title": "Keyboard (No Exception)",
+      "level": "AAA",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/keyboard-no-exception.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Front-End Development"
+        ],
+        "tt_steps": [
+          "2.1.3.A - All Functionality via Keyboard"
+        ]
+      }
+    },
+    "2.1.4": {
+      "title": "Character Key Shortcuts",
+      "level": "A",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/character-key-shortcuts.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Front-End Development",
+          "UX Design"
+        ],
+        "tt_steps": [
+          "2.1.4.A - Single Character Shortcut Override"
+        ]
+      }
+    },
+    "2.2.1": {
+      "title": "Timing Adjustable",
+      "level": "A",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/timing-adjustable.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Front-End Development",
+          "UX Design"
+        ],
+        "tt_steps": [
+          "2.2.1.A - Session Time Limit Control",
+          "2.2.1.B - Moving Content Timing"
+        ]
+      }
+    },
+    "2.2.2": {
+      "title": "Pause, Stop, Hide",
+      "level": "A",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/pause-stop-hide.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Front-End Development",
+          "UX Design"
+        ],
+        "tt_steps": [
+          "2.2.2.A - Moving Content Pause",
+          "2.2.2.B - Auto-Updating Content"
+        ]
+      }
+    },
+    "2.2.3": {
+      "title": "No Timing",
+      "level": "AAA",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/no-timing.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "UX Design",
+          "Business"
+        ],
+        "tt_steps": [
+          "2.2.3.A - No Time Limits on Content"
+        ]
+      }
+    },
+    "2.2.4": {
+      "title": "Interruptions",
+      "level": "AAA",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/interruptions.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "UX Design"
+        ],
+        "tt_steps": [
+          "2.2.4.A - Interruption Control Mechanism"
+        ]
+      }
+    },
+    "2.2.5": {
+      "title": "Re-authenticating",
+      "level": "AAA",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/re-authenticating.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Front-End Development",
+          "Business"
+        ],
+        "tt_steps": [
+          "2.2.5.A - Data Preservation After Re-auth"
+        ]
+      }
+    },
+    "2.2.6": {
+      "title": "Timeouts",
+      "level": "AAA",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/timeouts.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "UX Design",
+          "Business"
+        ],
+        "tt_steps": [
+          "2.2.6.A - Timeout Warning Display"
+        ]
+      }
+    },
+    "2.3.1": {
+      "title": "Three Flashes or Below Threshold",
+      "level": "A",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/three-flashes-or-below-threshold.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Content Authoring",
+          "Visual Design"
+        ],
+        "tt_steps": [
+          "2.3.1.A - Flash Frequency and Area"
+        ]
+      }
+    },
+    "2.3.2": {
+      "title": "Three Flashes",
+      "level": "AAA",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/three-flashes.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Content Authoring"
+        ],
+        "tt_steps": [
+          "2.3.2.A - No Three Flashes"
+        ]
+      }
+    },
+    "2.3.3": {
+      "title": "Animation from Interactions",
+      "level": "AAA",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/animation-from-interactions.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Front-End Development",
+          "UX Design"
+        ],
+        "tt_steps": [
+          "2.3.3.A - Disable Non-Essential Animation"
+        ]
+      }
+    },
+    "2.4.1": {
+      "title": "Bypass Blocks",
+      "level": "A",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/bypass-blocks.html",
+      "automation": {
+        "act": [
+          "3e11da"
+        ],
+        "axe": [
+          "bypass"
+        ],
+        "alfa": [
+          "SIA-R87"
+        ]
+      },
+      "manual": {
+        "roles": [
+          "Front-End Development"
+        ],
+        "tt_steps": [
+          "2.4.1.A - Skip Navigation Mechanism"
+        ]
+      }
+    },
+    "2.4.2": {
+      "title": "Page Titled",
+      "level": "A",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/page-titled.html",
+      "automation": {
+        "act": [
+          "2779a5"
+        ],
+        "axe": [
+          "document-title"
+        ],
+        "alfa": [
+          "SIA-R1"
+        ]
+      },
+      "manual": {
+        "roles": [
+          "Content Authoring",
+          "Front-End Development"
+        ],
+        "tt_steps": [
+          "2.4.2.A - Descriptive Page Title"
+        ]
+      }
+    },
+    "2.4.3": {
+      "title": "Focus Order",
+      "level": "A",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/focus-order.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Front-End Development",
+          "UX Design"
+        ],
+        "tt_steps": [
+          "2.4.3.A - Logical Focus Order",
+          "2.4.3.B - Focus Order with Dialogs"
+        ]
+      }
+    },
+    "2.4.4": {
+      "title": "Link Purpose (In Context)",
+      "level": "A",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/link-purpose-in-context.html",
+      "automation": {
+        "act": [
+          "c487ae"
+        ],
+        "axe": [
+          "link-name"
+        ],
+        "alfa": [
+          "SIA-R10"
+        ]
+      },
+      "manual": {
+        "roles": [
+          "Content Authoring",
+          "Front-End Development"
+        ],
+        "tt_steps": [
+          "2.4.4.A - Link Purpose from Text",
+          "2.4.4.B - Link Purpose from Context"
+        ]
+      }
+    },
+    "2.4.5": {
+      "title": "Multiple Ways",
+      "level": "AA",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/multiple-ways.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "UX Design",
+          "Business"
+        ],
+        "tt_steps": [
+          "2.4.5.A - Multiple Navigation Mechanisms"
+        ]
+      }
+    },
+    "2.4.6": {
+      "title": "Headings and Labels",
+      "level": "AA",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/headings-and-labels.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Content Authoring",
+          "Front-End Development"
+        ],
+        "tt_steps": [
+          "2.4.6.A - Heading Descriptiveness",
+          "2.4.6.B - Label Descriptiveness"
+        ]
+      }
+    },
+    "2.4.7": {
+      "title": "Focus Visible",
+      "level": "AA",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/focus-visible.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Front-End Development",
+          "Visual Design"
+        ],
+        "tt_steps": [
+          "2.4.7.A - Visible Focus Indicator"
+        ]
+      }
+    },
+    "2.4.8": {
+      "title": "Location",
+      "level": "AAA",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/location.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "UX Design",
+          "Content Authoring"
+        ],
+        "tt_steps": [
+          "2.4.8.A - User Location Indicator"
+        ]
+      }
+    },
+    "2.4.9": {
+      "title": "Link Purpose (Link Only)",
+      "level": "AAA",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/link-purpose-link-only.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Content Authoring"
+        ],
+        "tt_steps": [
+          "2.4.9.A - Standalone Link Purpose"
+        ]
+      }
+    },
+    "2.4.10": {
+      "title": "Section Headings",
+      "level": "AAA",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/section-headings.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Content Authoring"
+        ],
+        "tt_steps": [
+          "2.4.10.A - Section Organization with Headings"
+        ]
+      }
+    },
+    "2.4.11": {
+      "title": "Focus Not Obscured (Minimum)",
+      "level": "AA",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/focus-not-obscured-minimum.html",
+      "automation": {
+        "act": [
+          "04639e"
+        ],
+        "axe": [
+          "focus-not-obscured"
+        ],
+        "alfa": [
+          "SIA-R109"
+        ]
+      },
+      "manual": {
+        "roles": [
+          "UX Design",
+          "Front-End Development"
+        ],
+        "tt_steps": [
+          "2.4.11.A - Focus Visibility with Sticky Headers",
+          "2.4.11.B - Focus with Overlays"
+        ]
+      }
+    },
+    "2.4.12": {
+      "title": "Focus Not Obscured (Enhanced)",
+      "level": "AAA",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/focus-not-obscured-enhanced.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Visual Design",
+          "UX Design"
+        ],
+        "tt_steps": [
+          "2.4.12.A - Total Focus Ring Visibility"
+        ]
+      }
+    },
+    "2.4.13": {
+      "title": "Focus Appearance",
+      "level": "AAA",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance.html",
+      "automation": {
+        "act": [
+          "674b10"
+        ],
+        "axe": [
+          "focus-appearance"
+        ],
+        "alfa": [
+          "SIA-R110"
+        ]
+      },
+      "manual": {
+        "roles": [
+          "Visual Design"
+        ],
+        "tt_steps": [
+          "2.4.13.A - Contrast of Focus Indicator",
+          "2.4.13.B - Focus Indicator Area"
+        ]
+      }
+    },
+    "2.5.1": {
+      "title": "Pointer Gestures",
+      "level": "A",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/pointer-gestures.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Front-End Development",
+          "UX Design"
+        ],
+        "tt_steps": [
+          "2.5.1.A - Single Pointer Alternative for Multipoint Gestures"
+        ]
+      }
+    },
+    "2.5.2": {
+      "title": "Pointer Cancellation",
+      "level": "A",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/pointer-cancellation.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Front-End Development"
+        ],
+        "tt_steps": [
+          "2.5.2.A - Pointer Event Up-Event Activation"
+        ]
+      }
+    },
+    "2.5.3": {
+      "title": "Label in Name",
+      "level": "A",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/label-in-name.html",
+      "automation": {
+        "act": [
+          "2ee8b8"
+        ],
+        "axe": [
+          "label-content-name-mismatch"
+        ],
+        "alfa": [
+          "SIA-R14"
+        ]
+      },
+      "manual": {
+        "roles": [
+          "Front-End Development",
+          "Content Authoring"
+        ],
+        "tt_steps": [
+          "2.5.3.A - Visible Label Included in Accessible Name"
+        ]
+      }
+    },
+    "2.5.4": {
+      "title": "Motion Actuation",
+      "level": "A",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/motion-actuation.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Front-End Development",
+          "UX Design"
+        ],
+        "tt_steps": [
+          "2.5.4.A - Motion Alternative Mechanism"
+        ]
+      }
+    },
+    "2.5.5": {
+      "title": "Target Size (Enhanced)",
+      "level": "AAA",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Visual Design",
+          "Front-End Development"
+        ],
+        "tt_steps": [
+          "2.5.5.A - 44x44 CSS Pixel Target Size"
+        ]
+      }
+    },
+    "2.5.6": {
+      "title": "Concurrent Input Mechanisms",
+      "level": "AAA",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/concurrent-input-mechanisms.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Front-End Development"
+        ],
+        "tt_steps": [
+          "2.5.6.A - Input Method Non-Restriction"
+        ]
+      }
+    },
+    "2.5.7": {
+      "title": "Dragging Movements",
+      "level": "AA",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/dragging-movements.html",
+      "automation": {
+        "act": [],
+        "axe": [
+          "dragging-movements"
+        ],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "UX Design",
+          "Front-End Development"
+        ],
+        "tt_steps": [
+          "2.5.7.A - Single Pointer Alternative for Dragging"
+        ]
+      }
+    },
+    "2.5.8": {
+      "title": "Target Size (Minimum)",
+      "level": "AA",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html",
+      "automation": {
+        "act": [
+          "a25f45"
+        ],
+        "axe": [
+          "target-size"
+        ],
+        "alfa": [
+          "SIA-R101"
+        ]
+      },
+      "manual": {
+        "roles": [
+          "Visual Design"
+        ],
+        "tt_steps": [
+          "2.5.8.A - 24x24 CSS Pixel Verification"
+        ]
+      }
+    },
+    "3.1.1": {
+      "title": "Language of Page",
+      "level": "A",
+      "principle": "Understandable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/language-of-page.html",
+      "automation": {
+        "act": [
+          "bf051a"
+        ],
+        "axe": [
+          "html-has-lang",
+          "html-lang-valid"
+        ],
+        "alfa": [
+          "SIA-R4"
+        ]
+      },
+      "manual": {
+        "roles": [
+          "Front-End Development",
+          "Content Authoring"
+        ],
+        "tt_steps": [
+          "3.1.1.A - Page Language Attribute"
+        ]
+      }
+    },
+    "3.1.2": {
+      "title": "Language of Parts",
+      "level": "AA",
+      "principle": "Understandable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/language-of-parts.html",
+      "automation": {
+        "act": [
+          "de46e4"
+        ],
+        "axe": [
+          "valid-lang"
+        ],
+        "alfa": [
+          "SIA-R5"
+        ]
+      },
+      "manual": {
+        "roles": [
+          "Content Authoring",
+          "Front-End Development"
+        ],
+        "tt_steps": [
+          "3.1.2.A - Language Change Attribute"
+        ]
+      }
+    },
+    "3.1.3": {
+      "title": "Unusual Words",
+      "level": "AAA",
+      "principle": "Understandable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/unusual-words.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Content Authoring"
+        ],
+        "tt_steps": [
+          "3.1.3.A - Definitions for Unusual Words"
+        ]
+      }
+    },
+    "3.1.4": {
+      "title": "Abbreviations",
+      "level": "AAA",
+      "principle": "Understandable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/abbreviations.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Content Authoring"
+        ],
+        "tt_steps": [
+          "3.1.4.A - Abbreviation Expansion"
+        ]
+      }
+    },
+    "3.1.5": {
+      "title": "Reading Level",
+      "level": "AAA",
+      "principle": "Understandable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/reading-level.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Content Authoring"
+        ],
+        "tt_steps": [
+          "3.1.5.A - Lower Secondary Level Supplement"
+        ]
+      }
+    },
+    "3.1.6": {
+      "title": "Pronunciation",
+      "level": "AAA",
+      "principle": "Understandable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/pronunciation.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Content Authoring"
+        ],
+        "tt_steps": [
+          "3.1.6.A - Pronunciation Mechanism"
+        ]
+      }
+    },
+    "3.2.1": {
+      "title": "On Focus",
+      "level": "A",
+      "principle": "Understandable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/on-focus.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Front-End Development"
+        ],
+        "tt_steps": [
+          "3.2.1.A - No Context Change on Focus"
+        ]
+      }
+    },
+    "3.2.2": {
+      "title": "On Input",
+      "level": "A",
+      "principle": "Understandable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/on-input.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Front-End Development",
+          "UX Design"
+        ],
+        "tt_steps": [
+          "3.2.2.A - No Auto Context Change on Input"
+        ]
+      }
+    },
+    "3.2.3": {
+      "title": "Consistent Navigation",
+      "level": "AA",
+      "principle": "Understandable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/consistent-navigation.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "UX Design",
+          "Front-End Development"
+        ],
+        "tt_steps": [
+          "3.2.3.A - Navigation Consistency Across Pages"
+        ]
+      }
+    },
+    "3.2.4": {
+      "title": "Consistent Identification",
+      "level": "AA",
+      "principle": "Understandable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/consistent-identification.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "UX Design",
+          "Content Authoring"
+        ],
+        "tt_steps": [
+          "3.2.4.A - Consistent Component Labeling"
+        ]
+      }
+    },
+    "3.2.5": {
+      "title": "Change on Request",
+      "level": "AAA",
+      "principle": "Understandable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/change-on-request.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "UX Design",
+          "Front-End Development"
+        ],
+        "tt_steps": [
+          "3.2.5.A - Context Change on User Request Only"
+        ]
+      }
+    },
+    "3.2.6": {
+      "title": "Consistent Help",
+      "level": "A",
+      "principle": "Understandable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/consistent-help.html",
+      "automation": {
+        "act": [
+          "30b328"
+        ],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Content Authoring",
+          "Business"
+        ],
+        "tt_steps": [
+          "3.2.6.A - Relative Location of Help Mechanisms"
+        ]
+      }
+    },
+    "3.3.1": {
+      "title": "Error Identification",
+      "level": "A",
+      "principle": "Understandable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/error-identification.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Front-End Development",
+          "UX Design"
+        ],
+        "tt_steps": [
+          "3.3.1.A - Error Field Identification",
+          "3.3.1.B - Error Description in Text"
+        ]
+      }
+    },
+    "3.3.2": {
+      "title": "Labels or Instructions",
+      "level": "A",
+      "principle": "Understandable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/labels-or-instructions.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Content Authoring",
+          "UX Design"
+        ],
+        "tt_steps": [
+          "3.3.2.A - Input Field Labels",
+          "3.3.2.B - Required Field Instructions"
+        ]
+      }
+    },
+    "3.3.3": {
+      "title": "Error Suggestion",
+      "level": "AA",
+      "principle": "Understandable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/error-suggestion.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "UX Design",
+          "Content Authoring"
+        ],
+        "tt_steps": [
+          "3.3.3.A - Correction Suggestion for Known Errors"
+        ]
+      }
+    },
+    "3.3.4": {
+      "title": "Error Prevention (Legal, Financial, Data)",
+      "level": "AA",
+      "principle": "Understandable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/error-prevention-legal-financial-data.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "UX Design",
+          "Business"
+        ],
+        "tt_steps": [
+          "3.3.4.A - Reversible or Confirmable Submissions"
+        ]
+      }
+    },
+    "3.3.5": {
+      "title": "Help",
+      "level": "AAA",
+      "principle": "Understandable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/help.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "UX Design",
+          "Content Authoring"
+        ],
+        "tt_steps": [
+          "3.3.5.A - Context-Sensitive Help Availability"
+        ]
+      }
+    },
+    "3.3.6": {
+      "title": "Error Prevention (All)",
+      "level": "AAA",
+      "principle": "Understandable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/error-prevention-all.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "UX Design",
+          "Business"
+        ],
+        "tt_steps": [
+          "3.3.6.A - Reversible or Confirmable All Submissions"
+        ]
+      }
+    },
+    "3.3.7": {
+      "title": "Redundant Entry",
+      "level": "A",
+      "principle": "Understandable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/redundant-entry.html",
+      "automation": {
+        "act": [],
+        "axe": [
+          "no-redundant-entry"
+        ],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "UX Design",
+          "Front-End Development"
+        ],
+        "tt_steps": [
+          "3.3.7.A - Form Data Persistence Check"
+        ]
+      }
+    },
+    "3.3.8": {
+      "title": "Accessible Authentication (Minimum)",
+      "level": "AA",
+      "principle": "Understandable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/accessible-authentication-minimum.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Business",
+          "UX Design"
+        ],
+        "tt_steps": [
+          "3.3.8.A - Cognitive Function Test Audit"
+        ]
+      }
+    },
+    "3.3.9": {
+      "title": "Accessible Authentication (Enhanced)",
+      "level": "AAA",
+      "principle": "Understandable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/accessible-authentication-enhanced.html",
+      "automation": {
+        "act": [],
+        "axe": [],
+        "alfa": []
+      },
+      "manual": {
+        "roles": [
+          "Business"
+        ],
+        "tt_steps": [
+          "3.3.9.A - No-test Authentication Verification"
+        ]
+      }
+    },
+    "4.1.2": {
+      "title": "Name, Role, Value",
+      "level": "A",
+      "principle": "Robust",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/name-role-value.html",
+      "automation": {
+        "act": [
+          "4e8ab6",
+          "6cfa84",
+          "97a4e1",
+          "eac66b",
+          "m6b1q3",
+          "rs8a50",
+          "sm249k",
+          "cae760",
+          "07b338",
+          "1a02b0",
+          "2e1954",
+          "3e12e1",
+          "4e8ab6",
+          "59796f"
+        ],
+        "axe": [
+          "aria-allowed-attr",
+          "aria-command-name",
+          "aria-input-field-name",
+          "aria-meter-name",
+          "aria-progressbar-name",
+          "aria-required-attr",
+          "aria-required-children",
+          "aria-required-parent",
+          "aria-roles",
+          "aria-toggle-field-name",
+          "aria-tooltip-name",
+          "aria-valid-attr",
+          "aria-valid-attr-value",
+          "button-name",
+          "select-name"
+        ],
+        "alfa": [
+          "SIA-R11",
+          "SIA-R12",
+          "SIA-R13",
+          "SIA-R15",
+          "SIA-R20",
+          "SIA-R21",
+          "SIA-R22",
+          "SIA-R23",
+          "SIA-R24",
+          "SIA-R28",
+          "SIA-R29",
+          "SIA-R30",
+          "SIA-R31"
+        ]
+      },
+      "manual": {
+        "roles": [
+          "Front-End Development"
+        ],
+        "tt_steps": [
+          "4.1.2.A - Accessible Name and Description",
+          "4.1.2.B - Role Assignment",
+          "4.1.2.C - State, Property and Value",
+          "4.1.2.D - Custom Controls"
+        ]
+      }
+    },
+    "4.1.3": {
+      "title": "Status Messages",
+      "level": "AA",
+      "principle": "Robust",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/status-messages.html",
+      "automation": {
+        "act": [
+          "0sstp9"
+        ],
+        "axe": [
+          "status-messages"
+        ],
+        "alfa": [
+          "SIA-R90"
+        ]
+      },
+      "manual": {
+        "roles": [
+          "Front-End Development",
+          "UX Design"
+        ],
+        "tt_steps": [
+          "4.1.3.A - Status Message Role Assignment",
+          "4.1.3.B - Dynamic Content Announcements"
+        ]
+      }
+    }
+  }
+}

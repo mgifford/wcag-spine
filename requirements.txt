@@ -1,0 +1,2 @@
+# sync_data.py uses only the Python standard library (urllib, csv, json, re, pathlib).
+# Add third-party packages below if future scripts require them.
