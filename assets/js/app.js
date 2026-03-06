@@ -56,6 +56,31 @@ let filteredSC = {};
 
 let currentView = "cards"; // "cards" | "diagram" | "table"
 
+/**
+ * Plain-language descriptions shown below the view tabs.
+ * Each entry explains what the view shows and when to use it.
+ */
+const VIEW_DESCRIPTIONS = {
+  cards:   "Browse each WCAG 2.2 Success Criterion as an individual card. " +
+           "Each card shows the SC number and title, conformance level, automated test coverage " +
+           "(ACT rules, axe-core, Alfa), responsible ARRM roles, and Trusted Tester v5 steps. " +
+           "Use this view to explore the full details of individual criteria.",
+  diagram: "Visualise the filtered Success Criteria as a Mermaid.js graph — a \"spine\" " +
+           "that connects each SC to its automation rules on the left and manual-testing roles on the right. " +
+           "Nodes link out to WCAG, ACT, ARRM, and Trusted Tester pages. " +
+           "Use this view to understand relationships at a glance. " +
+           "Performance cap: the diagram renders at most 20 SCs at a time.",
+  table:   "Compare all filtered Success Criteria side-by-side in a compact, sortable table. " +
+           "Columns cover SC number, title, conformance level, WCAG principle, automated rules, " +
+           "ARRM roles, Trusted Tester steps, ARRM tasks, and overall automation coverage. " +
+           "Use this view for quick auditing or to scan many criteria at once.",
+  act:     "Browse by ACT (Accessibility Conformance Testing) rule ID rather than by Success Criterion. " +
+           "Each card shows which WCAG SCs the rule addresses and which testing engines " +
+           "(axe-core, Alfa, Equal Access, QualWeb) implement it. " +
+           "A second section lists engine-specific rules not yet mapped to a W3C ACT rule. " +
+           "Use this view to evaluate automated testing tool coverage or compare engine implementations.",
+};
+
 /* ------------------------------------------------------------------ */
 /*  Startup                                                             */
 /* ------------------------------------------------------------------ */
@@ -200,6 +225,11 @@ function switchView(view, updateHash = true) {
   document.getElementById("cards-view").hidden   = view !== "cards";
   document.getElementById("table-view").hidden   = view !== "table";
   document.getElementById("act-view").hidden     = view !== "act";
+  const descEl = document.getElementById("view-description");
+  if (descEl) {
+    descEl.textContent = VIEW_DESCRIPTIONS[view] ?? "";
+    descEl.hidden = false;
+  }
   renderCurrentView();
 }
 
@@ -841,6 +871,7 @@ function resetFilters() {
 function showLoading(show) {
   document.getElementById("loading").hidden = !show;
   document.getElementById("view-tabs").hidden = show;
+  document.getElementById("view-description").hidden = show;
   document.getElementById("diagram-view").hidden = show || currentView !== "diagram";
   document.getElementById("cards-view").hidden   = show || currentView !== "cards";
   document.getElementById("table-view").hidden   = show || currentView !== "table";
@@ -850,6 +881,7 @@ function showLoading(show) {
 function showError(msg) {
   document.getElementById("loading").hidden = true;
   document.getElementById("view-tabs").hidden = true;
+  document.getElementById("view-description").hidden = true;
   const main = document.querySelector("main");
   main.innerHTML = `
     <div class="empty-state" role="alert">
