@@ -159,6 +159,11 @@ AXE_NPM_DIST_TAGS_URL = "https://registry.npmjs.org/-/package/axe-core/dist-tags
 # Fallback axe-core version used when the npm registry is unreachable
 AXE_VERSION_FALLBACK = "4.11"
 
+# npm registry endpoint to resolve the latest published Alfa version
+ALFA_NPM_DIST_TAGS_URL = (
+    "https://registry.npmjs.org/-/package/@siteimprove/alfa-rules/dist-tags"
+)
+
 # ---------------------------------------------------------------------------
 # ARRM URL mappings
 # ---------------------------------------------------------------------------
@@ -270,6 +275,24 @@ def fetch_axe_version() -> str:
             print(f"  WARNING: Could not parse axe-core version: {exc}", file=sys.stderr)
     print(f"  WARNING: Using axe-core fallback version {AXE_VERSION_FALLBACK}", file=sys.stderr)
     return AXE_VERSION_FALLBACK
+
+
+def fetch_alfa_version() -> str | None:
+    """
+    Return the latest published @siteimprove/alfa-rules full version string
+    (e.g. "0.112.0"), or None when the npm registry is unreachable.
+    """
+    raw = fetch_text(ALFA_NPM_DIST_TAGS_URL)
+    if raw is not None:
+        try:
+            tags = json.loads(raw)
+            version = tags.get("latest", "")
+            if version:
+                return version
+        except (json.JSONDecodeError, AttributeError) as exc:
+            print(f"  WARNING: Could not parse Alfa version: {exc}", file=sys.stderr)
+    print("  WARNING: Could not determine Alfa version from npm.", file=sys.stderr)
+    return None
 
 
 def normalise_sc(raw: str) -> str | None:
@@ -842,6 +865,10 @@ def main() -> None:
     axe_version = fetch_axe_version()
     print(f"  → axe-core version: {axe_version}")
 
+    print("Fetching Alfa version …")
+    alfa_version = fetch_alfa_version()
+    print(f"  → Alfa version: {alfa_version or '(unavailable)'}")
+
     print("Fetching ACT rules …")
     act_map, act_implementations = fetch_act_rules()
     print(f"  → {sum(len(v) for v in act_map.values())} ACT rule/SC mappings found")
@@ -861,6 +888,8 @@ def main() -> None:
 
     spine["meta"]["generated"] = date.today().isoformat()
     spine["meta"]["axe_version"] = axe_version
+    if alfa_version:
+        spine["meta"]["alfa_version"] = alfa_version
     spine["meta"].setdefault("sources", {})["trusted_tester"] = TT_IMPLEMENTATIONS_URL
     spine["meta"]["sources"]["section508_coordinators"] = "https://github.com/Section508Coordinators"
 
