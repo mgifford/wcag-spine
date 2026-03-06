@@ -107,6 +107,19 @@ function axeRuleUrl(ruleId) {
   return `https://dequeuniversity.com/rules/axe/${encodeURIComponent(version)}/${encodeURIComponent(ruleId)}`;
 }
 
+/**
+ * Build the canonical URL for a Siteimprove Alfa rule documentation page.
+ *
+ * Rule IDs are stored as upper-case (e.g. ``"SIA-R3"``) but the Alfa docs site
+ * uses lower-case paths (e.g. ``https://alfa.siteimprove.com/rules/sia-r3``).
+ *
+ * @param {string} ruleId  The Alfa rule identifier, e.g. ``"SIA-R3"``.
+ * @returns {string}
+ */
+function alfaRuleUrl(ruleId) {
+  return `https://alfa.siteimprove.com/rules/${encodeURIComponent(ruleId.toLowerCase())}`;
+}
+
 /* ------------------------------------------------------------------ */
 /*  Controls & filtering                                                */
 /* ------------------------------------------------------------------ */
@@ -296,7 +309,7 @@ function buildCard(num, entry) {
                 `<li><a class="tag tag-axe" href="${axeRuleUrl(id)}" target="_blank" rel="noopener noreferrer" title="Axe rule ${escapeHTML(id)}">axe:${escapeHTML(id)}</a></li>`
               ).join("")}
               ${alfaIds.map(id =>
-                `<li><span class="tag tag-alfa" title="Alfa rule ${escapeHTML(id)}">${escapeHTML(id)}</span></li>`
+                `<li><a class="tag tag-alfa" href="${alfaRuleUrl(id)}" target="_blank" rel="noopener noreferrer" title="Alfa rule ${escapeHTML(id)}">${escapeHTML(id)}</a></li>`
               ).join("")}
             </ul>
             <div class="coverage-bar" aria-label="Automation coverage: ${automationCount(entry)} of 3 rule engines">
@@ -368,7 +381,7 @@ function renderTable() {
       `<a href="${axeRuleUrl(i)}" target="_blank" rel="noopener noreferrer" title="Axe rule ${escapeHTML(i)}">axe:${escapeHTML(i)}</a>`
     );
     const alfaLinks = (a.alfa ?? []).map(i =>
-      `<a href="https://github.com/siteimprove/alfa/blob/main/packages/alfa-rules/README.md" target="_blank" rel="noopener noreferrer" title="Alfa rule ${escapeHTML(i)}">${escapeHTML(i)}</a>`
+      `<a href="${alfaRuleUrl(i)}" target="_blank" rel="noopener noreferrer" title="Alfa rule ${escapeHTML(i)}">${escapeHTML(i)}</a>`
     );
     const allRuleLinks = [...actLinks, ...axeLinks, ...alfaLinks];
 
@@ -555,7 +568,7 @@ function renderActRules() {
           ${alfaRules.length ? `
             <dt class="act-engine act-engine-alfa">Alfa</dt>
             <dd>${alfaRules.map(r =>
-              `<span class="tag tag-alfa" title="Alfa rule ${escapeHTML(r)}">${escapeHTML(r)}</span>`
+              `<a class="tag tag-alfa" href="${alfaRuleUrl(r)}" target="_blank" rel="noopener noreferrer" title="Alfa rule ${escapeHTML(r)}">${escapeHTML(r)}</a>`
             ).join(" ")}</dd>` : ""}
           ${eaRules.length ? `
             <dt class="act-engine act-engine-ea">Equal Access</dt>
@@ -629,7 +642,7 @@ function renderActRules() {
       dl.innerHTML = `
         <dt class="act-engine act-engine-alfa">Alfa (engine-specific)</dt>
         <dd>${[...engineSpecific.alfa].sort().map(r =>
-          `<span class="tag tag-alfa" title="Alfa rule ${escapeHTML(r)}">${escapeHTML(r)}</span>`
+          `<a class="tag tag-alfa" href="${alfaRuleUrl(r)}" target="_blank" rel="noopener noreferrer" title="Alfa rule ${escapeHTML(r)}">${escapeHTML(r)}</a>`
         ).join(" ")}</dd>`;
       section.appendChild(dl);
     }
