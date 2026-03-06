@@ -21,6 +21,12 @@
 const DATA_URL = "data/master_spine.json";
 
 /**
+ * Maximum number of ARRM task IDs to show inline in a single Mermaid diagram
+ * node before appending "+N more".  Must match _ARRM_IDS_IN_NODE in sync_data.py.
+ */
+const ARRM_IDS_IN_NODE = 5;
+
+/**
  * Maps ARRM role / ownership names to their W3C WAI role pages.
  * Used to render linked role names in the Cards and Table views.
  *
@@ -124,7 +130,9 @@ function applyFilters() {
       if (automation === "full"    && count < 3)   continue;
     }
     if (query) {
-      const haystack = `${num} ${entry.title} ${(entry.manual?.roles ?? []).join(" ")}`.toLowerCase();
+      const arrmTaskText = (entry.manual?.arrm_tasks ?? [])
+        .map(t => `${t.id} ${t.task}`).join(" ");
+      const haystack = `${num} ${entry.title} ${(entry.manual?.roles ?? []).join(" ")} ${arrmTaskText}`.toLowerCase();
       if (!haystack.includes(query)) continue;
     }
     filteredSC[num] = entry;
@@ -393,6 +401,7 @@ function renderDiagram() {
   lines.push("  classDef sc fill:#e1f5fe,stroke:#01579b,stroke-width:4px,color:#000");
   lines.push("  classDef auto fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px,color:#000");
   lines.push("  classDef manual fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#000");
+  lines.push("  classDef arrm fill:#e8eaf6,stroke:#3949ab,stroke-width:2px,color:#000");
   lines.push("");
 
   const prevId = [];
@@ -411,6 +420,7 @@ function renderDiagram() {
       ...(m.roles    ?? []).map(r => sanitiseMermaid(r)),
       ...(m.tt_steps ?? []).map(s => sanitiseMermaid(s.split(" - ")[0])),
     ];
+    const arrmTaskIds = (m.arrm_tasks ?? []).map(t => t.id);
 
     const autoLabel  = autoItems.length
       ? `🤖 ${autoItems.slice(0, 4).join(", ")}${autoItems.length > 4 ? " …" : ""}`
@@ -418,9 +428,13 @@ function renderDiagram() {
     const manualLabel = manualItems.length
       ? `👤 ${manualItems.slice(0, 3).join(", ")}${manualItems.length > 3 ? " …" : ""}`
       : "👤 No manual steps";
+    const arrmLabel = arrmTaskIds.length
+      ? `🎯 ${arrmTaskIds.slice(0, ARRM_IDS_IN_NODE).join(", ")}${arrmTaskIds.length > ARRM_IDS_IN_NODE ? ` +${arrmTaskIds.length - ARRM_IDS_IN_NODE} more` : ""}`
+      : null;
 
     const autoId  = `AUTO_${safeNum}`;
     const manId   = `MAN_${safeNum}`;
+    const arrmId  = `ARRM_${safeNum}`;
     const autoEsc  = autoLabel.replace(/"/g, "'");
     const manEsc   = manualLabel.replace(/"/g, "'");
     const scTitle  = `${num}: ${entry.title}`.replace(/"/g, "'");
@@ -432,6 +446,11 @@ function renderDiagram() {
     lines.push(`    ${scId}(("${num}")):::sc`);
     lines.push(`    ${manId}["${manEsc}"]:::manual`);
     lines.push(`    ${autoId} --- ${scId} --- ${manId}`);
+    if (arrmLabel) {
+      const arrmEsc = arrmLabel.replace(/"/g, "'");
+      lines.push(`    ${arrmId}["${arrmEsc}"]:::arrm`);
+      lines.push(`    ${scId} --- ${arrmId}`);
+    }
     lines.push("  end");
     lines.push("");
 
@@ -442,6 +461,13 @@ function renderDiagram() {
       if (autoItems.length > 0) {
         lines.push(`  click ${autoId} href "${wcagUrl}" _blank`);
       }
+      lines.push("");
+    }
+
+    // ARRM click → ARRM tasks page section
+    if (arrmLabel) {
+      const arrmTaskUrl = (m.arrm_tasks[0]?.category_url) ?? "https://www.w3.org/WAI/planning/arrm/tasks/";
+      lines.push(`  click ${arrmId} href "${arrmTaskUrl}" _blank`);
       lines.push("");
     }
 

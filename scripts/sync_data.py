@@ -56,6 +56,20 @@ ARRM_ROLE_URLS: dict[str, str] = {
     "Visual Design":              f"{ARRM_BASE_URL}/visual-designer/",
 }
 
+# Maps role names (as they appear in master_spine.json manual.roles) to short
+# abbreviations used as Mermaid node-ID suffixes.  Both the short form used by
+# arrm-wcag-sc.csv and the long form used by arrm-all-tasks.csv are listed so
+# that either can appear in the data without breaking node-ID generation.
+ROLE_ABBREVIATIONS: dict[str, str] = {
+    "Business":                    "BUS",
+    "Content Authoring":           "CA",
+    "Front-End Development":       "FE",
+    "UX Design":                   "UX",
+    "User Experience (UX) Design": "UX",
+    "User Experience Design":      "UX",
+    "Visual Design":               "VD",
+}
+
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
@@ -63,6 +77,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR = REPO_ROOT / "data"
 SEED_FILE = DATA_DIR / "master_spine.json"
 OUTPUT_FILE = DATA_DIR / "master_spine.json"
+MERMAID_FILE = REPO_ROOT / "wcag-sc-roles-diagram.md"
 
 
 # ---------------------------------------------------------------------------
@@ -288,6 +303,160 @@ def sanitise_label(text: str) -> str:
 
 
 # ---------------------------------------------------------------------------
+# Mermaid diagram generator
+# ---------------------------------------------------------------------------
+
+# Maximum ARRM task IDs to show inline in a single diagram node before
+# appending "+N more".
+_ARRM_IDS_IN_NODE = 5
+
+
+def generate_mermaid_md(spine: dict) -> None:
+    """
+    Regenerate wcag-sc-roles-diagram.md from the in-memory spine so that
+    every SC node is accompanied by an ARRM-task node listing the mapped
+    task IDs (e.g. IMG-001, IMG-002 …).
+
+    Layout
+    ------
+    ::graph LR::
+      AUTO  -->  SC  -->  ROLE(s)
+                  |
+                 ARRM task-IDs node  (new – indigo)
+
+    All ``click`` directives are collected and written at the end of the
+    diagram block so the node definitions stay readable.
+    """
+    sc_dict = spine.get("success_criteria", {})
+
+    header = (
+        "# WCAG 2.2 Success Criteria – Roles & Testing\n"
+        "\n"
+        "SC nodes form a **vertical spine** running top to bottom in the centre.\n"
+        "Automated testing tools (ACT, AXE, Alfa) branch off to the **left** of each SC.\n"
+        "Responsible roles branch off to the **right** of each SC.\n"
+        "ARRM task IDs branch off from each SC node.\n"
+        "(`graph LR` is used so that root SC nodes stack vertically, not horizontally.)\n"
+        "\n"
+        "**Legend**\n"
+        "\n"
+        "| Colour | Meaning |\n"
+        "|--------|---------|\n"
+        "| 🔵 Blue | Success Criterion |\n"
+        "| 🟠 Orange | Responsible Role |\n"
+        "| 🟣 Purple | ACT Automated Rules |\n"
+        "| 🟡 Yellow | AXE Automated Rules |\n"
+        "| 🩷 Pink | Alfa Automated Rules |\n"
+        "| 🟦 Indigo | ARRM Task IDs |\n"
+        "\n"
+    )
+
+    node_lines: list[str] = []
+    click_lines: list[str] = []
+
+    node_lines.append("```mermaid")
+    node_lines.append("graph LR")
+    node_lines.append("    classDef sc   fill:#e1f5fe,stroke:#01579b,color:#000")
+    node_lines.append("    classDef role fill:#fff3e0,stroke:#e65100,color:#000")
+    node_lines.append("    classDef act  fill:#f3e5f5,stroke:#6a1b9a,color:#000")
+    node_lines.append("    classDef axe  fill:#fffde7,stroke:#f57f17,color:#000")
+    node_lines.append("    classDef alfa fill:#fce4ec,stroke:#880e4f,color:#000")
+    node_lines.append("    classDef arrm fill:#e8eaf6,stroke:#3949ab,color:#000")
+    node_lines.append("")
+
+    for sc_num, entry in sc_dict.items():
+        safe = sc_num.replace(".", "_")
+        sc_node = f"N{safe}"
+
+        a = entry.get("automation", {})
+        m = entry.get("manual", {})
+        act_ids    = a.get("act", [])
+        axe_ids    = a.get("axe", [])
+        alfa_ids   = a.get("alfa", [])
+        roles      = m.get("roles", [])
+        arrm_tasks = m.get("arrm_tasks", [])
+
+        node_lines.append(f"    {sc_node}(({sc_num})):::sc")
+
+        # --- Automation nodes (point INTO the SC) ---
+        if act_ids:
+            act_label = "ACT: " + ", ".join(act_ids)
+            node_lines.append(f'    A_act_{safe}["{act_label}"]:::act --> {sc_node}')
+            click_lines.append(
+                f'    click A_act_{safe} href '
+                f'"https://www.w3.org/WAI/standards-guidelines/act/rules/{act_ids[0]}/" _blank'
+            )
+
+        if axe_ids:
+            axe_label = "AXE: " + ", ".join(axe_ids)
+            node_lines.append(f'    A_axe_{safe}["{axe_label}"]:::axe --> {sc_node}')
+            click_lines.append(
+                f'    click A_axe_{safe} href '
+                f'"https://dequeuniversity.com/rules/axe/latest/{axe_ids[0]}" _blank'
+            )
+
+        if alfa_ids:
+            alfa_label = "Alfa: " + ", ".join(alfa_ids)
+            node_lines.append(f'    A_alfa_{safe}["{alfa_label}"]:::alfa --> {sc_node}')
+            click_lines.append(
+                f'    click A_alfa_{safe} href '
+                '"https://github.com/siteimprove/alfa/blob/main/packages/alfa-rules/README.md" _blank'
+            )
+
+        # --- Role nodes (point OUT of the SC) ---
+        seen_abbrs: set[str] = set()
+        for role in roles:
+            abbr = ROLE_ABBREVIATIONS.get(role)
+            if abbr is None:
+                # Fallback: initials of each word
+                abbr = "".join(w[0] for w in role.split() if w).upper()
+            # Deduplicate within this SC (two roles mapping to same abbr is unlikely
+            # but guard against it to keep IDs unique).
+            unique_abbr = abbr
+            suffix = 2
+            while unique_abbr in seen_abbrs:
+                unique_abbr = f"{abbr}{suffix}"
+                suffix += 1
+            seen_abbrs.add(unique_abbr)
+            role_node = f"R{safe}_{unique_abbr}"
+            safe_role_label = role.replace('"', "'")
+            node_lines.append(f'    {sc_node} --> {role_node}["{safe_role_label}"]:::role')
+
+        # --- ARRM task-IDs node (new) ---
+        if arrm_tasks:
+            task_ids = [t["id"] for t in arrm_tasks]
+            if len(task_ids) <= _ARRM_IDS_IN_NODE:
+                ids_label = ", ".join(task_ids)
+            else:
+                ids_label = (
+                    ", ".join(task_ids[:_ARRM_IDS_IN_NODE])
+                    + f" +{len(task_ids) - _ARRM_IDS_IN_NODE} more"
+                )
+            arrm_node = f"T_{safe}"
+            node_lines.append(f'    {sc_node} --> {arrm_node}["ARRM: {ids_label}"]:::arrm')
+            category_url = arrm_tasks[0].get(
+                "category_url", "https://www.w3.org/WAI/planning/arrm/tasks/"
+            )
+            click_lines.append(
+                f'    click {arrm_node} href "{category_url}" _blank'
+            )
+
+        # SC click
+        sc_url = entry.get("url", "")
+        if sc_url:
+            click_lines.append(f'    click {sc_node} href "{sc_url}" _blank')
+
+        node_lines.append("")
+
+    # Combine
+    diagram_lines = node_lines + click_lines + ["```"]
+
+    content = header + "\n".join(diagram_lines) + "\n"
+    MERMAID_FILE.write_text(content, encoding="utf-8")
+    print(f"  → Wrote {MERMAID_FILE} ({len(sc_dict)} SCs)")
+
+
+# ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
 
@@ -321,6 +490,9 @@ def main() -> None:
 
     total_sc = len(spine.get("success_criteria", {}))
     print(f"Done — {total_sc} Success Criteria written to {OUTPUT_FILE}")
+
+    print("Generating Mermaid diagram …")
+    generate_mermaid_md(spine)
 
 
 if __name__ == "__main__":
