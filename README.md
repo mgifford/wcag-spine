@@ -1,4 +1,4 @@
-# WCAG Mirror Spine
+# WCAG Spine
 
 > An interactive GitHub Pages dashboard that visualises the "Mirror Spine" of
 > WCAG 2.2 — bridging Responsibility (ARRM) and Technical Testing
