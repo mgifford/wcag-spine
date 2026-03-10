@@ -32,8 +32,8 @@ graph LR
 
     N3_1_1((3.1.1)):::sc
     A_act_3_1_1["ACT: bf051a"]:::act --> N3_1_1
-    A_axe_3_1_1["AXE: html-has-lang, html-lang-valid"]:::axe --> N3_1_1
-    A_alfa_3_1_1["Alfa: SIA-R4"]:::alfa --> N3_1_1
+    A_axe_3_1_1["AXE: document-title, html-has-lang, html-lang-valid"]:::axe --> N3_1_1
+    A_alfa_3_1_1["Alfa: SIA-R1, SIA-R4"]:::alfa --> N3_1_1
     N3_1_1 --> R3_1_1_FE["Front-End Development"]:::role
     N3_1_1 --> R3_1_1_CA["Content Authoring"]:::role
     N3_1_1 --> T_3_1_1["ARRM: SCT-020, SCT-021"]:::arrm
@@ -155,8 +155,8 @@ graph LR
     N3_3_9 --> TT_3_3_9["TT: 3.3.9.A"]:::tt
 
     click A_act_3_1_1 href "https://www.w3.org/WAI/standards-guidelines/act/rules/bf051a/" _blank
-    click A_axe_3_1_1 href "https://dequeuniversity.com/rules/axe/4.11/html-has-lang" _blank
-    click A_alfa_3_1_1 href "https://alfa.siteimprove.com/rules/sia-r4" _blank
+    click A_axe_3_1_1 href "https://dequeuniversity.com/rules/axe/4.11/document-title" _blank
+    click A_alfa_3_1_1 href "https://alfa.siteimprove.com/rules/sia-r1" _blank
     click T_3_1_1 href "https://www.w3.org/WAI/planning/arrm/tasks/#static-content" _blank
     click TT_3_1_1 href "https://section508coordinators.github.io/TrustedTester/language.html" _blank
     click N3_1_1 href "https://www.w3.org/WAI/WCAG22/Understanding/language-of-page.html" _blank
