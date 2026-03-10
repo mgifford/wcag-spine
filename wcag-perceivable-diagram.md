@@ -32,8 +32,8 @@ graph LR
 
     N1_1_1((1.1.1)):::sc
     A_act_1_1_1["ACT: 23a2a8, 3ea0c8, 59796f, 9eb3f6, a25f45, c3232f, de46e4"]:::act --> N1_1_1
-    A_axe_1_1_1["AXE: area-alt, image-alt, input-image-alt, object-alt, role-img-alt, svg-img-alt, input-button-name"]:::axe --> N1_1_1
-    A_alfa_1_1_1["Alfa: SIA-R2, SIA-R3, SIA-R25, SIA-R26, SIA-R41"]:::alfa --> N1_1_1
+    A_axe_1_1_1["AXE: area-alt, image-alt, input-button-name, input-image-alt, object-alt, role-img-alt, svg-img-alt"]:::axe --> N1_1_1
+    A_alfa_1_1_1["Alfa: SIA-R2, SIA-R25, SIA-R26, SIA-R3, SIA-R41"]:::alfa --> N1_1_1
     N1_1_1 --> R1_1_1_CA["Content Authoring"]:::role
     N1_1_1 --> R1_1_1_FE["Front-End Development"]:::role
     N1_1_1 --> R1_1_1_UX["UX Design"]:::role
@@ -90,8 +90,8 @@ graph LR
 
     N1_3_1((1.3.1)):::sc
     A_act_1_3_1["ACT: 307n5z, 3e12e1, 674b10, 78fd32, 7d6734, b49b2e, d0f69e, d9e9d9, eba20a, f51b46"]:::act --> N1_3_1
-    A_axe_1_3_1["AXE: definition-list, dlitem, list, listitem, landmark-one-main, table-duplicate-name, td-headers-attr, th-has-data-cells"]:::axe --> N1_3_1
-    A_alfa_1_3_1["Alfa: SIA-R1, SIA-R4, SIA-R7, SIA-R13, SIA-R16, SIA-R39, SIA-R53"]:::alfa --> N1_3_1
+    A_axe_1_3_1["AXE: definition-list, dlitem, landmark-one-main, list, listitem, table-duplicate-name, td-headers-attr, th-has-data-cells"]:::axe --> N1_3_1
+    A_alfa_1_3_1["Alfa: SIA-R1, SIA-R13, SIA-R16, SIA-R39, SIA-R4, SIA-R53, SIA-R7"]:::alfa --> N1_3_1
     N1_3_1 --> R1_3_1_FE["Front-End Development"]:::role
     N1_3_1 --> R1_3_1_CA["Content Authoring"]:::role
     N1_3_1 --> R1_3_1_UX["UX Design"]:::role
@@ -148,7 +148,7 @@ graph LR
     N1_4_3((1.4.3)):::sc
     A_act_1_4_3["ACT: 09o5cg, afw4f7"]:::act --> N1_4_3
     A_axe_1_4_3["AXE: color-contrast"]:::axe --> N1_4_3
-    A_alfa_1_4_3["Alfa: SIA-R69"]:::alfa --> N1_4_3
+    A_alfa_1_4_3["Alfa: SIA-R66, SIA-R69"]:::alfa --> N1_4_3
     N1_4_3 --> R1_4_3_VD["Visual Design"]:::role
     N1_4_3 --> T_1_4_3["ARRM: CSS-011, CSS-012"]:::arrm
     N1_4_3 --> TT_1_4_3["TT: 1.4.3.A, 1.4.3.B"]:::tt
@@ -167,7 +167,9 @@ graph LR
     N1_4_5 --> TT_1_4_5["TT: 1.4.5.A"]:::tt
 
     N1_4_6((1.4.6)):::sc
-    A_axe_1_4_6["AXE: color-contrast-enhanced"]:::axe --> N1_4_6
+    A_act_1_4_6["ACT: 09o5cg"]:::act --> N1_4_6
+    A_axe_1_4_6["AXE: color-contrast, color-contrast-enhanced"]:::axe --> N1_4_6
+    A_alfa_1_4_6["Alfa: SIA-R66, SIA-R69"]:::alfa --> N1_4_6
     N1_4_6 --> R1_4_6_VD["Visual Design"]:::role
     N1_4_6 --> T_1_4_6["ARRM: CSS-016, CSS-017"]:::arrm
     N1_4_6 --> TT_1_4_6["TT: 1.4.6.A, 1.4.6.B"]:::tt
@@ -286,7 +288,7 @@ graph LR
     click N1_4_2 href "https://www.w3.org/WAI/WCAG22/Understanding/audio-control.html" _blank
     click A_act_1_4_3 href "https://www.w3.org/WAI/standards-guidelines/act/rules/09o5cg/" _blank
     click A_axe_1_4_3 href "https://dequeuniversity.com/rules/axe/4.11/color-contrast" _blank
-    click A_alfa_1_4_3 href "https://alfa.siteimprove.com/rules/sia-r69" _blank
+    click A_alfa_1_4_3 href "https://alfa.siteimprove.com/rules/sia-r66" _blank
     click T_1_4_3 href "https://www.w3.org/WAI/planning/arrm/tasks/#css-and-presentation" _blank
     click TT_1_4_3 href "https://section508coordinators.github.io/TrustedTester/sensory.html" _blank
     click N1_4_3 href "https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html" _blank
@@ -297,7 +299,9 @@ graph LR
     click T_1_4_5 href "https://www.w3.org/WAI/planning/arrm/tasks/#images-and-graphs" _blank
     click TT_1_4_5 href "https://section508coordinators.github.io/TrustedTester/images.html" _blank
     click N1_4_5 href "https://www.w3.org/WAI/WCAG22/Understanding/images-of-text.html" _blank
-    click A_axe_1_4_6 href "https://dequeuniversity.com/rules/axe/4.11/color-contrast-enhanced" _blank
+    click A_act_1_4_6 href "https://www.w3.org/WAI/standards-guidelines/act/rules/09o5cg/" _blank
+    click A_axe_1_4_6 href "https://dequeuniversity.com/rules/axe/4.11/color-contrast" _blank
+    click A_alfa_1_4_6 href "https://alfa.siteimprove.com/rules/sia-r66" _blank
     click T_1_4_6 href "https://www.w3.org/WAI/planning/arrm/tasks/#css-and-presentation" _blank
     click TT_1_4_6 href "https://section508coordinators.github.io/TrustedTester/sensory.html" _blank
     click N1_4_6 href "https://www.w3.org/WAI/WCAG22/Understanding/contrast-enhanced.html" _blank

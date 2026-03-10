@@ -8,7 +8,11 @@
       "axe_core": "https://github.com/dequelabs/axe-core/blob/develop/doc/rule-descriptions.md",
       "alfa": "https://github.com/siteimprove/alfa/blob/main/packages/alfa-rules/README.md",
       "trusted_tester": "https://section508coordinators.github.io/TrustedTester/index.html",
-      "section508_coordinators": "https://github.com/Section508Coordinators"
+      "section508_coordinators": "https://github.com/Section508Coordinators",
+      "act_testcases": "https://www.w3.org/WAI/content-assets/wcag-act-rules/testcases.json",
+      "alfa_rules_index": "https://raw.githubusercontent.com/Siteimprove/alfa/main/packages/alfa-rules/src/index.ts",
+      "axe_rules_api": "https://api.github.com/repos/dequelabs/axe-core/contents/lib/rules",
+      "alfa_earl": "https://raw.githubusercontent.com/Siteimprove/alfa-act-r/main/reports/alfa-automated-report.json"
     },
     "axe_version": "4.11",
     "act_implementations": {
@@ -111,6 +115,27 @@
         "alfa": [],
         "equal_access": [],
         "qualweb": []
+      },
+      "09o5cg": {
+        "axe": [
+          "color-contrast"
+        ],
+        "alfa": [
+          "SIA-R66",
+          "SIA-R69"
+        ],
+        "equal_access": [],
+        "qualweb": []
+      },
+      "afw4f7": {
+        "axe": [
+          "color-contrast"
+        ],
+        "alfa": [
+          "SIA-R69"
+        ],
+        "equal_access": [],
+        "qualweb": []
       }
     },
     "alfa_version": "0.112.0"
@@ -134,17 +159,17 @@
         "axe": [
           "area-alt",
           "image-alt",
+          "input-button-name",
           "input-image-alt",
           "object-alt",
           "role-img-alt",
-          "svg-img-alt",
-          "input-button-name"
+          "svg-img-alt"
         ],
         "alfa": [
           "SIA-R2",
-          "SIA-R3",
           "SIA-R25",
           "SIA-R26",
+          "SIA-R3",
           "SIA-R41"
         ]
       },
@@ -734,21 +759,21 @@
         "axe": [
           "definition-list",
           "dlitem",
+          "landmark-one-main",
           "list",
           "listitem",
-          "landmark-one-main",
           "table-duplicate-name",
           "td-headers-attr",
           "th-has-data-cells"
         ],
         "alfa": [
           "SIA-R1",
-          "SIA-R4",
-          "SIA-R7",
           "SIA-R13",
           "SIA-R16",
           "SIA-R39",
-          "SIA-R53"
+          "SIA-R4",
+          "SIA-R53",
+          "SIA-R7"
         ]
       },
       "manual": {
@@ -1554,6 +1579,7 @@
           "color-contrast"
         ],
         "alfa": [
+          "SIA-R66",
           "SIA-R69"
         ]
       },
@@ -1693,11 +1719,17 @@
       "principle": "Perceivable",
       "url": "https://www.w3.org/WAI/WCAG22/Understanding/contrast-enhanced.html",
       "automation": {
-        "act": [],
+        "act": [
+          "09o5cg"
+        ],
         "axe": [
+          "color-contrast",
           "color-contrast-enhanced"
         ],
-        "alfa": []
+        "alfa": [
+          "SIA-R66",
+          "SIA-R69"
+        ]
       },
       "manual": {
         "roles": [
@@ -3255,10 +3287,12 @@
           "bf051a"
         ],
         "axe": [
+          "document-title",
           "html-has-lang",
           "html-lang-valid"
         ],
         "alfa": [
+          "SIA-R1",
           "SIA-R4"
         ]
       },
@@ -4077,6 +4111,7 @@
           "aria-valid-attr",
           "aria-valid-attr-value",
           "button-name",
+          "image-alt",
           "select-name"
         ],
         "alfa": [
@@ -4084,6 +4119,7 @@
           "SIA-R12",
           "SIA-R13",
           "SIA-R15",
+          "SIA-R2",
           "SIA-R20",
           "SIA-R21",
           "SIA-R22",

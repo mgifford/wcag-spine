@@ -32,8 +32,8 @@ graph LR
 
     N4_1_2((4.1.2)):::sc
     A_act_4_1_2["ACT: 4e8ab6, 6cfa84, 97a4e1, eac66b, m6b1q3, rs8a50, sm249k, cae760, 07b338, 1a02b0, 2e1954, 3e12e1, 4e8ab6, 59796f"]:::act --> N4_1_2
-    A_axe_4_1_2["AXE: aria-allowed-attr, aria-command-name, aria-input-field-name, aria-meter-name, aria-progressbar-name, aria-required-attr, aria-required-children, aria-required-parent, aria-roles, aria-toggle-field-name, aria-tooltip-name, aria-valid-attr, aria-valid-attr-value, button-name, select-name"]:::axe --> N4_1_2
-    A_alfa_4_1_2["Alfa: SIA-R11, SIA-R12, SIA-R13, SIA-R15, SIA-R20, SIA-R21, SIA-R22, SIA-R23, SIA-R24, SIA-R28, SIA-R29, SIA-R30, SIA-R31"]:::alfa --> N4_1_2
+    A_axe_4_1_2["AXE: aria-allowed-attr, aria-command-name, aria-input-field-name, aria-meter-name, aria-progressbar-name, aria-required-attr, aria-required-children, aria-required-parent, aria-roles, aria-toggle-field-name, aria-tooltip-name, aria-valid-attr, aria-valid-attr-value, button-name, image-alt, select-name"]:::axe --> N4_1_2
+    A_alfa_4_1_2["Alfa: SIA-R11, SIA-R12, SIA-R13, SIA-R15, SIA-R2, SIA-R20, SIA-R21, SIA-R22, SIA-R23, SIA-R24, SIA-R28, SIA-R29, SIA-R30, SIA-R31"]:::alfa --> N4_1_2
     N4_1_2 --> R4_1_2_FE["Front-End Development"]:::role
     N4_1_2 --> T_4_1_2["ARRM: SEM-028, SEM-029, ANM-037"]:::arrm
     N4_1_2 --> TT_4_1_2["TT: 4.1.2.A, 4.1.2.B, 4.1.2.C, 4.1.2.D"]:::tt
