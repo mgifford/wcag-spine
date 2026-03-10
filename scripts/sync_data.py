@@ -557,7 +557,7 @@ def fetch_alfa_sc_map() -> dict[str, list[str]]:
     rule_id_re = re.compile(r'\bSIA[_-]R(\d+)\b', re.IGNORECASE)
     alfa_ids = sorted(set(
         f"SIA-R{m.group(1)}" for m in rule_id_re.finditer(raw)
-    ), key=lambda x: int(x.split("-R", 1)[1]))
+    ), key=lambda x: int(x.split("-R", 1)[1]) if "-R" in x else 0)
 
     # If the index already embeds Criterion.of("X.Y.Z") mappings, extract them.
     # Build a coarse mapping: for each criterion found adjacent to each rule mention.
@@ -589,7 +589,7 @@ def fetch_alfa_sc_map() -> dict[str, list[str]]:
     base_rule_url = ALFA_RULES_INDEX_URL.rsplit("/", 1)[0] + "/rules/"
     fetched = 0
     for rid in alfa_ids:
-        rule_file_url = base_rule_url + rid.lower().replace("-", "-") + ".ts"
+        rule_file_url = base_rule_url + rid.lower() + ".ts"
         rule_src = fetch_text(rule_file_url)
         if rule_src is None:
             continue
@@ -621,7 +621,9 @@ def _parse_axe_rule_tags(tags: list) -> list[str]:
         # + one-or-more digits for the SC number (e.g. wcag143 → 1.4.3,
         # wcag1411 → 1.4.11, wcag2410 → 2.4.10).
         # Level tags like "wcag2a", "wcag21aa" do NOT end with \d+ so are excluded.
-        m = re.fullmatch(r'wcag([1-4])([1-5])(\d+)', tag_str, re.IGNORECASE)
+        # Using [1-4] for principle and \d for guideline (single digit, future-proof
+        # beyond guideline 5 while still capturing only meaningful single-digit guidelines).
+        m = re.fullmatch(r'wcag([1-4])(\d)(\d+)', tag_str, re.IGNORECASE)
         if m:
             sc_list.append(f"{m.group(1)}.{m.group(2)}.{m.group(3)}")
     return sc_list
