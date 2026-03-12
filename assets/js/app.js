@@ -404,23 +404,33 @@ function updateSummaryBar() {
 
 function switchView(view, updateHash = true) {
   currentView = view;
-  if (updateHash) {
+  const isChecklist = view === "checklist";
+  if (updateHash && !isChecklist) {
     history.replaceState(null, "", "#" + view);
   }
   document.querySelectorAll(".tab-btn").forEach(b => {
     b.setAttribute("aria-selected", String(b.dataset.view === view));
   });
-  document.getElementById("diagram-view").hidden = view !== "diagram";
-  document.getElementById("cards-view").hidden   = view !== "cards";
-  document.getElementById("table-view").hidden   = view !== "table";
-  document.getElementById("act-view").hidden     = view !== "act";
-  document.getElementById("coverage-view").hidden = view !== "coverage";
+  // Show/hide controls and tabs based on whether we're in checklist mode
+  const controlsEl = document.getElementById("controls");
+  if (controlsEl) controlsEl.hidden = isChecklist;
+  const tabsEl = document.getElementById("view-tabs");
+  if (tabsEl) tabsEl.hidden = isChecklist;
   const descEl = document.getElementById("view-description");
-  if (descEl) {
-    descEl.textContent = VIEW_DESCRIPTIONS[view] ?? "";
-    descEl.hidden = false;
+  if (descEl) descEl.hidden = isChecklist;
+  document.getElementById("diagram-view").hidden   = view !== "diagram";
+  document.getElementById("cards-view").hidden     = view !== "cards";
+  document.getElementById("table-view").hidden     = view !== "table";
+  document.getElementById("act-view").hidden       = view !== "act";
+  document.getElementById("coverage-view").hidden  = view !== "coverage";
+  document.getElementById("checklist-view").hidden = view !== "checklist";
+  if (!isChecklist) {
+    if (descEl) {
+      descEl.textContent = VIEW_DESCRIPTIONS[view] ?? "";
+      descEl.hidden = false;
+    }
+    renderCurrentView();
   }
-  renderCurrentView();
 }
 
 function renderCurrentView() {
@@ -509,6 +519,7 @@ function buildCard(num, entry) {
         </a>
       </span>
       <a class="sc-card-anchor" href="#sc-${escapeAttr(num.replace(/\./g, "_"))}" aria-label="Permalink to SC ${escapeAttr(num)} ${escapeAttr(entry.title)}">#</a>
+      <a class="sc-checklist-link" href="#checklist/${escapeAttr(num.replace(/\./g, ""))}" aria-label="Open testing checklist for SC ${escapeAttr(num)}">☑ Checklist</a>
       <span class="level-badge level-${escapeHTML(entry.level)}" aria-label="Level ${escapeHTML(entry.level)}">
         ${escapeHTML(entry.level)}
       </span>
@@ -1364,8 +1375,15 @@ function sanitiseMermaid(str) {
 /* ------------------------------------------------------------------ */
 
 function handleHashNavigation() {
-  const hash = window.location.hash.slice(1); // e.g. "cards", "diagram", "2.4.11"
+  const hash = window.location.hash.slice(1); // e.g. "cards", "diagram", "2.4.11", "checklist/111"
   if (!hash) return;
+
+  // Checklist deep-link: #checklist/111  or  #checklist/1.1.1
+  if (hash.startsWith("checklist/")) {
+    const slug = hash.slice("checklist/".length);
+    if (spineData) showChecklistView(slug);
+    return;
+  }
 
   // If the hash is a known tab name, switch to that tab
   const TAB_VIEWS = ["cards", "diagram", "table", "act", "coverage"];
@@ -1410,6 +1428,350 @@ function resetFilters() {
 }
 
 /* ------------------------------------------------------------------ */
+/*  Checklist view                                                      */
+/* ------------------------------------------------------------------ */
+
+/**
+ * SC key currently shown in the checklist view (e.g. "1.1.1").
+ * @type {string|null}
+ */
+let checklistSCKey = null;
+
+/**
+ * Converts a URL slug like "111" or "2411" into a WCAG SC key like
+ * "1.1.1" or "2.4.11" by removing dots from known SC keys and matching.
+ *
+ * @param {string} slug - digits-only SC identifier (dots optional)
+ * @returns {string|null}
+ */
+function scKeyFromSlug(slug) {
+  if (!spineData) return null;
+  const needle = slug.replace(/\./g, "");
+  for (const key of Object.keys(spineData.success_criteria)) {
+    if (key.replace(/\./g, "") === needle) return key;
+  }
+  return null;
+}
+
+/**
+ * Returns the localStorage key for a single checklist item.
+ *
+ * @param {string} scKey  - e.g. "1.1.1"
+ * @param {string} itemId - sanitised item identifier
+ * @returns {string}
+ */
+function checklistStorageKey(scKey, itemId) {
+  return `wcag-spine-checklist-${scKey}-${itemId}`;
+}
+
+/**
+ * Returns whether a checklist item is checked.
+ *
+ * @param {string} scKey
+ * @param {string} itemId
+ * @returns {boolean}
+ */
+function isChecklistItemChecked(scKey, itemId) {
+  return localStorage.getItem(checklistStorageKey(scKey, itemId)) === "1";
+}
+
+/**
+ * Persists or clears the checked state for a checklist item.
+ *
+ * @param {string}  scKey
+ * @param {string}  itemId
+ * @param {boolean} checked
+ */
+function setChecklistItemChecked(scKey, itemId, checked) {
+  const key = checklistStorageKey(scKey, itemId);
+  if (checked) {
+    localStorage.setItem(key, "1");
+  } else {
+    localStorage.removeItem(key);
+  }
+  updateChecklistProgress(scKey);
+}
+
+/**
+ * Refreshes the progress bar and count text in the checklist view.
+ *
+ * @param {string} scKey
+ */
+function updateChecklistProgress(scKey) {
+  const container = document.getElementById("checklist-view");
+  const checkboxes = container.querySelectorAll('input[type="checkbox"]');
+  const total   = checkboxes.length;
+  const checked = Array.from(checkboxes).filter(c => c.checked).length;
+
+  const progressText = container.querySelector(".checklist-progress-text");
+  if (progressText) {
+    progressText.textContent = `${checked} of ${total} tasks completed`;
+  }
+  const progressFill = container.querySelector(".checklist-progress-fill");
+  if (progressFill) {
+    progressFill.style.width = total > 0 ? `${Math.round(checked / total * 100)}%` : "0%";
+  }
+  // aria-valuenow belongs on the element with role="progressbar"
+  const progressBar = container.querySelector(".checklist-progress-bar");
+  if (progressBar) {
+    progressBar.setAttribute("aria-valuenow", String(checked));
+  }
+}
+
+/**
+ * Generates a stable localStorage item ID from a prefix and a raw identifier.
+ * Replaces non-alphanumeric characters with hyphens.
+ *
+ * @param {string} prefix - e.g. "tt" or "arrm"
+ * @param {string} rawId  - e.g. "1.1.1.A" or "IMG-001"
+ * @returns {string}
+ */
+function checklistItemId(prefix, rawId) {
+  return `${prefix}-${rawId.replace(/[^a-zA-Z0-9]/g, "-")}`;
+}
+
+/**
+ * Shows the checklist view for the given URL slug (e.g. "111" = SC 1.1.1).
+ * If the slug does not match a known SC, an error message is displayed.
+ *
+ * @param {string} slug - SC number with dots removed
+ */
+function showChecklistView(slug) {
+  const scKey = scKeyFromSlug(slug);
+  if (!scKey) {
+    document.getElementById("checklist-view").innerHTML = `
+      <div class="checklist-back-bar">
+        <button class="checklist-back-btn">← All Criteria</button>
+      </div>
+      <div class="empty-state" role="alert">
+        <h2>⚠️ Success Criterion not found</h2>
+        <p>No WCAG 2.2 Success Criterion matches <code>${escapeHTML(slug)}</code>.</p>
+        <p>Try a valid SC number such as
+          <a href="#checklist/111">1.1.1</a> or
+          <a href="#checklist/2411">2.4.11</a>.
+        </p>
+      </div>`;
+    document.getElementById("checklist-view")
+      .querySelector(".checklist-back-btn")
+      .addEventListener("click", () => switchView("cards"));
+    switchView("checklist", false);
+    return;
+  }
+
+  checklistSCKey = scKey;
+  renderChecklist(scKey, spineData.success_criteria[scKey]);
+  switchView("checklist", false);
+  // Canonical URL: dots stripped from SC number
+  history.replaceState(null, "", `#checklist/${scKey.replace(/\./g, "")}`);
+}
+
+/**
+ * Builds and injects the full interactive checklist for one SC.
+ *
+ * @param {string} scKey  - e.g. "1.1.1"
+ * @param {object} entry  - SC entry from master_spine.json
+ */
+function renderChecklist(scKey, entry) {
+  const container = document.getElementById("checklist-view");
+  const a = entry.automation ?? {};
+  const m = entry.manual    ?? {};
+  const actIds    = a.act        ?? [];
+  const axeIds    = a.axe        ?? [];
+  const alfaIds   = a.alfa       ?? [];
+  const steps     = m.tt_steps   ?? [];
+  const arrmTasks = m.arrm_tasks ?? [];
+  const wcagUrl   = entry.url ?? "https://www.w3.org/WAI/WCAG22/Understanding/";
+
+  // ---- Trusted Tester step checkboxes ----
+  const ttItems = steps.map(s => {
+    const stepId = s.split(" - ")[0];
+    const itemId = checklistItemId("tt", stepId);
+    const checked = isChecklistItemChecked(scKey, itemId);
+    const ttUrl   = ttStepUrl(stepId);
+    return `<li class="checklist-item${checked ? " checklist-item-done" : ""}">
+      <label class="checklist-label">
+        <input type="checkbox" class="checklist-checkbox"
+          data-item-id="${escapeAttr(itemId)}"
+          ${checked ? "checked" : ""}
+          aria-label="Mark Trusted Tester step ${escapeAttr(stepId)} as complete" />
+        <span class="checklist-item-text">
+          <a href="${escapeAttr(ttUrl)}" target="_blank" rel="noopener noreferrer"
+            title="Trusted Tester step ${escapeAttr(stepId)}">${escapeHTML(s)}</a>
+        </span>
+      </label>
+    </li>`;
+  }).join("");
+
+  // ---- ARRM task checkboxes ----
+  const arrmItems = arrmTasks.map(t => {
+    const itemId  = checklistItemId("arrm", t.id);
+    const checked = isChecklistItemChecked(scKey, itemId);
+    const roleLink = t.role_url
+      ? `<a href="${escapeAttr(t.role_url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(t.primary_ownership)}</a>`
+      : `<span>${escapeHTML(t.primary_ownership)}</span>`;
+    const taskLink = `<a href="${escapeAttr(t.category_url)}" target="_blank" rel="noopener noreferrer"
+        title="View ${escapeAttr(t.id)} in ARRM">${escapeHTML(t.id)}</a>`;
+    return `<li class="checklist-item${checked ? " checklist-item-done" : ""}">
+      <label class="checklist-label">
+        <input type="checkbox" class="checklist-checkbox"
+          data-item-id="${escapeAttr(itemId)}"
+          ${checked ? "checked" : ""}
+          aria-label="Mark ARRM task ${escapeAttr(t.id)} as complete" />
+        <span class="checklist-item-text">
+          <span class="checklist-item-meta">${taskLink} — ${roleLink}</span>
+          <span class="checklist-item-desc">${escapeHTML(t.task)}</span>
+        </span>
+      </label>
+    </li>`;
+  }).join("");
+
+  // ---- Automated rules (informational) ----
+  const autoItems = [
+    ...actIds.map(id =>
+      `<li><a class="tag tag-act"
+         href="https://www.w3.org/WAI/standards-guidelines/act/rules/${encodeURIComponent(id)}/"
+         target="_blank" rel="noopener noreferrer"
+         title="ACT Rule ${escapeHTML(id)}">ACT:${escapeHTML(id)}</a></li>`),
+    ...axeIds.map(id =>
+      `<li><a class="tag tag-axe"
+         href="${axeRuleUrl(id)}"
+         target="_blank" rel="noopener noreferrer"
+         title="axe rule ${escapeHTML(id)}">axe:${escapeHTML(id)}</a></li>`),
+    ...alfaIds.map(id =>
+      `<li><a class="tag tag-alfa"
+         href="${alfaRuleUrl(id)}"
+         target="_blank" rel="noopener noreferrer"
+         title="Alfa rule ${escapeHTML(id)}">${escapeHTML(id)}</a></li>`),
+  ].join("");
+
+  const totalTasks  = steps.length + arrmTasks.length;
+  const checkedCount = [
+    ...steps.map(s => {
+      const stepId = s.split(" - ")[0];
+      return isChecklistItemChecked(scKey, checklistItemId("tt", stepId)) ? 1 : 0;
+    }),
+    ...arrmTasks.map(t =>
+      isChecklistItemChecked(scKey, checklistItemId("arrm", t.id)) ? 1 : 0),
+  ].reduce((a, b) => a + b, 0);
+
+  const pct = totalTasks > 0 ? Math.round(checkedCount / totalTasks * 100) : 0;
+
+  container.innerHTML = `
+    <div class="checklist-back-bar">
+      <button class="checklist-back-btn" id="checklist-back">← All Criteria</button>
+      <nav class="checklist-breadcrumb" aria-label="Breadcrumb">
+        <ol>
+          <li><a href="#cards">Dashboard</a></li>
+          <li aria-current="page">SC ${escapeHTML(scKey)}</li>
+        </ol>
+      </nav>
+    </div>
+
+    <header class="checklist-header">
+      <div class="checklist-sc-meta">
+        <span class="sc-number" aria-label="Success Criterion ${escapeHTML(scKey)}">${escapeHTML(scKey)}</span>
+        <span class="level-badge level-${escapeHTML(entry.level)}"
+          aria-label="Level ${escapeHTML(entry.level)}">${escapeHTML(entry.level)}</span>
+        <span class="checklist-principle">${escapeHTML(entry.principle)}</span>
+      </div>
+      <h2 class="checklist-sc-title">
+        <a href="${escapeAttr(wcagUrl)}" target="_blank" rel="noopener noreferrer">
+          ${escapeHTML(entry.title)}
+        </a>
+      </h2>
+      ${totalTasks > 0 ? `
+      <div class="checklist-progress-group">
+        <span class="checklist-progress-text" aria-live="polite"
+          aria-atomic="true">${checkedCount} of ${totalTasks} tasks completed</span>
+        <div class="checklist-progress-bar"
+          role="progressbar"
+          aria-label="Task completion"
+          aria-valuemin="0"
+          aria-valuenow="${checkedCount}"
+          aria-valuemax="${totalTasks}">
+          <div class="checklist-progress-fill" style="width:${pct}%"></div>
+        </div>
+        <button class="checklist-reset-btn"
+          aria-label="Reset all checkboxes for SC ${escapeHTML(scKey)}">Reset</button>
+      </div>` : ""}
+    </header>
+
+    <div class="checklist-body">
+      ${steps.length > 0 ? `
+      <section class="checklist-section" aria-labelledby="checklist-tt-heading">
+        <h3 id="checklist-tt-heading" class="checklist-section-heading">
+          🔬 Trusted Tester v5 Steps
+          <span class="checklist-count" aria-label="${steps.length} steps">${steps.length}</span>
+        </h3>
+        <ul class="checklist-list" aria-label="Trusted Tester steps for SC ${escapeHTML(scKey)}">
+          ${ttItems}
+        </ul>
+      </section>` : ""}
+
+      ${arrmTasks.length > 0 ? `
+      <section class="checklist-section" aria-labelledby="checklist-arrm-heading">
+        <h3 id="checklist-arrm-heading" class="checklist-section-heading">
+          📋 ARRM Tasks
+          <span class="checklist-count" aria-label="${arrmTasks.length} tasks">${arrmTasks.length}</span>
+        </h3>
+        <ul class="checklist-list" aria-label="ARRM tasks for SC ${escapeHTML(scKey)}">
+          ${arrmItems}
+        </ul>
+      </section>` : ""}
+
+      ${actIds.length + axeIds.length + alfaIds.length > 0 ? `
+      <section class="checklist-section" aria-labelledby="checklist-auto-heading">
+        <h3 id="checklist-auto-heading" class="checklist-section-heading">
+          🤖 Automated Test Rules
+          <span class="checklist-count"
+            aria-label="${actIds.length + axeIds.length + alfaIds.length} rules">
+            ${actIds.length + axeIds.length + alfaIds.length}
+          </span>
+        </h3>
+        <p class="checklist-auto-note">
+          These rules run automatically — verify each engine is included in your test suite.
+        </p>
+        <ul class="tag-list" aria-label="Automated test rules for SC ${escapeHTML(scKey)}">
+          ${autoItems}
+        </ul>
+      </section>` : ""}
+
+      ${steps.length === 0 && arrmTasks.length === 0
+        && actIds.length + axeIds.length + alfaIds.length === 0 ? `
+      <div class="empty-state">
+        <h3>No testing tasks mapped</h3>
+        <p>No Trusted Tester steps, ARRM tasks, or automated rules are linked to
+          SC ${escapeHTML(scKey)} yet.</p>
+      </div>` : ""}
+    </div>`;
+
+  // Back button
+  document.getElementById("checklist-back")
+    .addEventListener("click", () => switchView("cards"));
+
+  // Reset button
+  const resetBtn = container.querySelector(".checklist-reset-btn");
+  if (resetBtn) {
+    resetBtn.addEventListener("click", () => {
+      container.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+        cb.checked = false;
+        localStorage.removeItem(checklistStorageKey(scKey, cb.dataset.itemId));
+        cb.closest(".checklist-item")?.classList.remove("checklist-item-done");
+      });
+      updateChecklistProgress(scKey);
+    });
+  }
+
+  // Individual checkbox change
+  container.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+    cb.addEventListener("change", () => {
+      setChecklistItemChecked(scKey, cb.dataset.itemId, cb.checked);
+      cb.closest(".checklist-item")?.classList.toggle("checklist-item-done", cb.checked);
+    });
+  });
+}
+
+/* ------------------------------------------------------------------ */
 /*  Helpers                                                             */
 /* ------------------------------------------------------------------ */
 
@@ -1422,6 +1784,7 @@ function showLoading(show) {
   document.getElementById("table-view").hidden   = show || currentView !== "table";
   document.getElementById("act-view").hidden     = show || currentView !== "act";
   document.getElementById("coverage-view").hidden = show || currentView !== "coverage";
+  document.getElementById("checklist-view").hidden = show || currentView !== "checklist";
 }
 
 function showError(msg) {

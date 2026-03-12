@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WCAG Spine — Redirecting…</title>
+  <script>
+    /**
+     * GitHub Pages SPA path-routing redirect.
+     *
+     * Visitors who arrive at path-based URLs like
+     *   https://mgifford.github.io/wcag-spine/111
+     * are redirected to the hash-based checklist URL:
+     *   https://mgifford.github.io/wcag-spine/#checklist/111
+     *
+     * The slug (e.g. "111") is the WCAG SC number with dots removed:
+     *   1.1.1  →  111     2.4.11  →  2411
+     */
+    (function () {
+      var basePath = "/wcag-spine";
+      var fullPath = window.location.pathname; // e.g. "/wcag-spine/111"
+      var slug = fullPath.slice(basePath.length).replace(/^\/+/, "").replace(/\/+$/, "");
+      var dest = window.location.origin + basePath + "/";
+      if (slug) {
+        dest += "#checklist/" + encodeURIComponent(slug);
+      }
+      window.location.replace(dest);
+    }());
+  </script>
+</head>
+<body>
+  <p>Redirecting to WCAG Spine dashboard…
+    <a id="fallback-link" href="./">Go to dashboard</a>
+  </p>
+  <script>
+    // Update the fallback link with the slug if available
+    (function () {
+      var basePath = "/wcag-spine";
+      var slug = window.location.pathname.slice(basePath.length).replace(/^\/+/, "").replace(/\/+$/, "");
+      if (slug) {
+        document.getElementById("fallback-link").href = "./#checklist/" + encodeURIComponent(slug);
+        document.getElementById("fallback-link").textContent = "Go to checklist for SC " + slug;
+      }
+    }());
+  </script>
+</body>
+</html>
