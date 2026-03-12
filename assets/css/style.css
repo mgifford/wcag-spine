@@ -33,6 +33,14 @@
   padding: 0;
 }
 
+/*
+ * Ensure the HTML `hidden` attribute always hides elements.
+ * Without this rule, author-level `display` overrides (e.g. `display: grid`
+ * on #cards-view) can win over the UA-stylesheet `display: none` that the
+ * `hidden` attribute implies, leaving "hidden" panels still visible.
+ */
+[hidden] { display: none !important; }
+
 body {
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   font-size: 15px;
