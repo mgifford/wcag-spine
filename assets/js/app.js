@@ -1376,7 +1376,16 @@ function sanitiseMermaid(str) {
 
 function handleHashNavigation() {
   const hash = window.location.hash.slice(1); // e.g. "cards", "diagram", "2.4.11", "checklist/111"
-  if (!hash) return;
+  if (!hash) {
+    // When the browser back button lands on a hash-less URL while the
+    // checklist is displayed (e.g. the user opened the site without a hash
+    // and then navigated to a checklist), fall back to the cards view.
+    if (currentView === "checklist") {
+      switchView("cards");
+      window.scrollTo({ top: 0, behavior: "instant" });
+    }
+    return;
+  }
 
   // Checklist deep-link: #checklist/111  or  #checklist/1.1.1
   if (hash.startsWith("checklist/")) {
@@ -1388,7 +1397,11 @@ function handleHashNavigation() {
   // If the hash is a known tab name, switch to that tab
   const TAB_VIEWS = ["cards", "diagram", "table", "act", "coverage"];
   if (TAB_VIEWS.includes(hash)) {
+    const wasChecklist = currentView === "checklist";
     switchView(hash);
+    // Restore the viewport to the top when returning from the checklist so
+    // the full tab content is immediately visible.
+    if (wasChecklist) window.scrollTo({ top: 0, behavior: "instant" });
     return;
   }
 
@@ -1553,15 +1566,21 @@ function showChecklistView(slug) {
       </div>`;
     document.getElementById("checklist-view")
       .querySelector(".checklist-back-btn")
-      .addEventListener("click", () => switchView("cards"));
+      .addEventListener("click", () => {
+        switchView("cards");
+        window.scrollTo({ top: 0, behavior: "instant" });
+      });
     switchView("checklist", false);
+    window.scrollTo({ top: 0, behavior: "instant" });
     return;
   }
 
   checklistSCKey = scKey;
   renderChecklist(scKey, spineData.success_criteria[scKey]);
   switchView("checklist", false);
-  // Canonical URL: dots stripped from SC number
+  window.scrollTo({ top: 0, behavior: "instant" });
+  // Normalise the URL (dots stripped) without adding an extra history entry —
+  // the browser already added one when the user followed the #checklist/… link.
   history.replaceState(null, "", `#checklist/${scKey.replace(/\./g, "")}`);
 }
 
@@ -1751,9 +1770,13 @@ function renderChecklist(scKey, entry) {
       </div>` : ""}
     </div>`;
 
-  // Back button
+  // Back button — navigate back in history so the browser back button and
+  // the in-page back button both return the user to the previous view.
   document.getElementById("checklist-back")
-    .addEventListener("click", () => switchView("cards"));
+    .addEventListener("click", () => {
+      switchView("cards");
+      window.scrollTo({ top: 0, behavior: "instant" });
+    });
 
   // Reset button
   const resetBtn = container.querySelector(".checklist-reset-btn");
