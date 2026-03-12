@@ -144,7 +144,7 @@
   // ---------------------------------------------------------------------------
   const diagramEl = document.getElementById("sources-diagram");
   if (diagramEl && window.mermaid) {
-    const diagramDef = `%%accTitle Data flow from upstream sources to WCAG Spine dashboard
+    const diagramDef = `%%accTitle Upstream sources to WCAG Spine dashboard data flow
 %%accDescr Upstream sources (W3C ACT Rules, Deque axe-core, Siteimprove Alfa, W3C ARRM, DHS Trusted Tester, CivicActions FPC, W3C WCAG 2.2) feed into sync_data.py which writes master_spine.json. app.js reads master_spine.json and powers the dashboard views.
 graph LR
     subgraph Upstream["Upstream Sources"]
