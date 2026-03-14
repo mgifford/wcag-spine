@@ -579,7 +579,7 @@ function buildCard(num, entry) {
     </header>
     ${fpcCodes.length > 0
       ? `<div class="fpc-section" aria-label="Disability groups affected by this criterion">
-          <span class="fpc-section-label">Disabilities affected:</span>
+          <span class="fpc-section-label">Disability Impact:</span>
           ${fpcBadges}
         </div>`
       : ""
