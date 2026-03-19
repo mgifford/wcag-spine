@@ -97,6 +97,15 @@ The `master_spine.json` schema must remain:
 - Update cross-references when adding new pages
 - Follow the project's plain-language style
 
+### AI Disclosure
+
+Transparency about AI use is a core commitment of this project. When contributing as an AI agent, you **must** update the **AI Disclosure** section in `README.md`:
+
+- Add your LLM name (and version or variant if known) to the table if it is not already listed.
+- Describe the task(s) you performed (e.g., code generation, documentation, data mapping, PR automation).
+- Be specific: note whether your contribution affected the project *build*, *data pipeline*, or *runtime* behaviour.
+- **Never** add an LLM or tool that you cannot confirm was actually used in this project.
+
 ## Mermaid Diagram Review Checklist
 
 Before submitting any Mermaid diagram change, verify:

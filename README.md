@@ -177,6 +177,31 @@ Pull requests are welcome! To add or correct a rule mapping:
 
 ---
 
+## AI Disclosure <a href="#ai-disclosure" aria-label="Link to AI Disclosure section">#</a>
+
+Transparency about AI use is a core commitment of this project. Below is a record of every AI tool
+that has been used, and how it was used. If you contribute using an AI tool, please add it to this
+table (see [`AGENTS.md`](AGENTS.md) for instructions).
+
+### AI tools used in development
+
+| Tool | Role |
+|------|------|
+| **GitHub Copilot** (Coding Agent / `copilot-swe-agent`) | Code generation, documentation authoring, PR automation, and project scaffolding throughout the build of this project |
+
+### Runtime AI
+
+**None.** The dashboard is a fully static site. When a user opens the application, no LLM or
+AI API is called. All data is pre-built by the daily CI sync script and served as a static JSON
+file (`data/master_spine.json`).
+
+### Browser-based AI
+
+**None.** No on-device or browser-based AI features are present. The frontend (`app.js`) does not
+load any AI SDK, call any inference endpoint, or delegate any logic to a browser AI API.
+
+---
+
 ## Documentation <a href="#documentation" aria-label="Link to Documentation section">#</a>
 
 | Document | Description |
