@@ -1734,6 +1734,7 @@ function renderChecklist(scKey, entry) {
     </header>
 
     <div class="checklist-body">
+      ${steps.length > 0 ? `
       <section class="checklist-section" aria-labelledby="checklist-tt-heading">
         <h3 id="checklist-tt-heading" class="checklist-section-heading">
           🔬 Trusted Tester v5 Steps
