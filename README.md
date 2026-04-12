@@ -52,7 +52,7 @@ For every WCAG 2.2 Success Criterion (1.1.1 → 4.1.3) the dashboard renders a
 | View | Description |
 |------|-------------|
 | **Cards** | Responsive card grid — the default view |
-| **Diagram** | Mermaid.js spine graph (first 20 filtered SCs) |
+| **Spine** | Interactive HTML/CSS "vertebra" graph |
 | **Table** | Sortable/scannable data table |
 | **ACT Rules** | Browse by ACT rule ID, showing engine implementations |
 | **Coverage** | Automation coverage statistics and testing methodology |
@@ -73,27 +73,18 @@ wcag-spine/
 ├── index.html                          # GitHub Pages entry point
 ├── assets/
 │   ├── css/style.css                   # Dashboard styles
-│   └── js/app.js                       # Frontend logic (filtering, Mermaid, routing)
+│   └── js/app.js                       # Frontend logic (filtering, spine generation, routing)
 ├── data/
 │   └── master_spine.json               # Merged WCAG 2.2 data (auto-updated daily)
 ├── scripts/
 │   └── sync_data.py                    # Python data orchestrator
 ├── testing-methods.md                  # Testing methodology & resource documentation
-├── wcag-sc-roles-diagram.md            # Index linking to per-principle diagrams
-├── wcag-perceivable-diagram.md         # Principle 1 – Perceivable (1.x.x)
-├── wcag-operable-diagram.md            # Principle 2 – Operable (2.x.x)
-├── wcag-understandable-diagram.md      # Principle 3 – Understandable (3.x.x)
-├── wcag-robust-diagram.md              # Principle 4 – Robust (4.x.x)
 ├── .github/
 │   └── workflows/
 │       └── sync_accessibility.yml      # Daily sync + GitHub Pages deploy
 └── requirements.txt
 ```
 
-> **Note on diagram splitting:** GitHub enforces a maximum text size for Mermaid
-> diagrams. To stay within that limit, the diagrams are split one file per WCAG
-> principle (Perceivable / Operable / Understandable / Robust). The overview file
-> [`wcag-sc-roles-diagram.md`](wcag-sc-roles-diagram.md) links to each.
 
 ---
 
@@ -188,6 +179,7 @@ table (see [`AGENTS.md`](AGENTS.md) for instructions).
 | Tool | Role |
 |------|------|
 | **GitHub Copilot** (Coding Agent / `copilot-swe-agent`) | Code generation, documentation authoring, PR automation, and project scaffolding throughout the build of this project |
+| **Antigravity** (AI Coding Assistant) | Removal of MermaidJS dependency; Implementation of pure HTML/CSS Spine View and data flow visualisations; Implementation of live Trusted Tester v5 scraper and data provenance source badges; Documentation updates |
 
 ### Runtime AI
 
@@ -204,12 +196,8 @@ load any AI SDK, call any inference endpoint, or delegate any logic to a browser
 
 ## Documentation <a href="#documentation" aria-label="Link to Documentation section">#</a>
 
-| Document | Description |
-|----------|-------------|
 | [`testing-methods.md`](testing-methods.md) | Testing methodology, resource links, and coverage gap analysis |
-| [`examples/MERMAID_ACCESSIBILITY_BEST_PRACTICES.md`](examples/MERMAID_ACCESSIBILITY_BEST_PRACTICES.md) | How to write accessible Mermaid diagrams |
 | [`ACCESSIBILITY.md`](ACCESSIBILITY.md) | Project accessibility commitments |
-| [`wcag-sc-roles-diagram.md`](wcag-sc-roles-diagram.md) | Per-principle static Mermaid diagrams |
 
 ---
 

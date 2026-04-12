@@ -331,7 +331,6 @@
           <li>Fetch Section 508 FPC mapping (<code>mapping-wcag-to-fpc.csv</code>)</li>
           <li>Merge all sources into the spine; propagate ACT implementation data</li>
           <li>Write <code>data/master_spine.json</code> with updated <code>meta.generated</code> date</li>
-          <li>Regenerate Mermaid diagram files per WCAG principle</li>
           <li>Deploy to GitHub Pages</li>
         </ol>
         <p>
@@ -392,24 +391,7 @@
     </p>
   </footer>
 
-  <!-- ================================================================ -->
-  <!-- Scripts                                                           -->
-  <!-- ================================================================ -->
-  <script
-    src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"
-    crossorigin="anonymous"
-  ></script>
-  <script>
-    // Initialise Mermaid before sources.js runs (for the interconnection diagram)
-    if (window.mermaid) {
-      window.mermaid.initialize({
-        startOnLoad: false,
-        theme: window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "default",
-        securityLevel: "loose",
-        flowchart: { useMaxWidth: true, htmlLabels: false, curve: "basis" },
-      });
-    }
-  </script>
+  <!-- No MermaidJS — using pure HTML/CSS for diagrams -->
   <script src="assets/js/sources.js"></script>
 </body>
 </html>

@@ -140,82 +140,46 @@
   }
 
   // ---------------------------------------------------------------------------
-  // Render Mermaid interconnection diagram
+  // Render HTML interconnection data flow
   // ---------------------------------------------------------------------------
   const diagramEl = document.getElementById("sources-diagram");
-  if (diagramEl && window.mermaid) {
-    const diagramDef = `%%accTitle Upstream sources to WCAG Spine dashboard data flow
-%%accDescr Upstream sources (W3C ACT Rules, Deque axe-core, Siteimprove Alfa, W3C ARRM, DHS Trusted Tester, CivicActions FPC, W3C WCAG 2.2) feed into sync_data.py which writes master_spine.json. app.js reads master_spine.json and powers the dashboard views.
-graph LR
-    subgraph Upstream["Upstream Sources"]
-        ACT["W3C ACT Rules\\nwcag-mapping.json"]:::upstream
-        AXE["Deque axe-core\\nlib/rules/"]:::upstream
-        ALFA["Siteimprove Alfa\\nalfa-rules/src/index.ts"]:::upstream
-        EARL["Alfa EARL Report\\nalfa-automated-report.json"]:::upstream
-        ARRM["W3C ARRM\\narrm-all-tasks.csv"]:::upstream
-        TT["DHS Trusted Tester v5"]:::ai
-        FPC["CivicActions FPC\\nmapping-wcag-to-fpc.csv"]:::upstream
-        WCAG["W3C WCAG 2.2\\nSpecification"]:::upstream
-    end
-
-    subgraph Sync["Daily Sync (GitHub Actions)"]
-        PY["scripts/sync_data.py"]:::sync
-    end
-
-    subgraph Data["Data"]
-        JSON["data/master_spine.json"]:::data
-    end
-
-    subgraph Dashboard["WCAG Spine Dashboard"]
-        APP["assets/js/app.js"]:::app
-        CARDS["Cards view"]:::view
-        TABLE["Table view"]:::view
-        DIAG["Diagram view"]:::view
-        ACT_VIEW["ACT Rules view"]:::view
-        COV["Coverage view"]:::view
-        CHK["Checklist view"]:::view
-    end
-
-    ACT --> PY
-    AXE --> PY
-    ALFA --> PY
-    EARL --> PY
-    ARRM --> PY
-    TT --> PY
-    FPC --> PY
-    WCAG --> PY
-
-    PY --> JSON
-    JSON --> APP
-
-    APP --> CARDS
-    APP --> TABLE
-    APP --> DIAG
-    APP --> ACT_VIEW
-    APP --> COV
-    APP --> CHK
-
-    classDef upstream fill:#0d47a1,stroke:#0d47a1,color:#fff
-    classDef ai fill:#e65100,stroke:#e65100,color:#fff
-    classDef sync fill:#1b5e20,stroke:#1b5e20,color:#fff
-    classDef data fill:#4a148c,stroke:#4a148c,color:#fff
-    classDef app fill:#2e7d32,stroke:#2e7d32,color:#fff
-    classDef view fill:#37474f,stroke:#37474f,color:#fff`;
-
-    try {
-      const id = "sources-interconnect-diagram";
-      const { svg } = await window.mermaid.render(id, diagramDef);
-      diagramEl.innerHTML = svg;
-
-      // Apply accessible SVG attributes
-      const svgEl = diagramEl.querySelector("svg");
-      if (svgEl) {
-        svgEl.setAttribute("role", "img");
-        svgEl.setAttribute("aria-labelledby", "interconnect-diagram-title interconnect-diagram-desc");
-      }
-    } catch (err) {
-      diagramEl.innerHTML = `<p class="diagram-error">Diagram could not be rendered: ${escHtml(err.message)}</p>`;
-    }
+  if (diagramEl) {
+    diagramEl.innerHTML = `
+      <div class="flow-container" aria-label="Data flow from upstream sources to dashboard">
+        <div class="flow-step">
+          <div class="flow-step-title">Upstream Sources</div>
+          <div class="flow-step-items">
+            <span class="badge badge-upstream">W3C ACT</span>
+            <span class="badge badge-upstream">axe-core</span>
+            <span class="badge badge-upstream">Alfa</span>
+            <span class="badge badge-upstream">ARRM</span>
+            <span class="badge badge-ai">Trusted Tester</span>
+          </div>
+        </div>
+        <div class="flow-arrow">➡</div>
+        <div class="flow-step">
+          <div class="flow-step-title">Sync Pipeline</div>
+          <div class="flow-step-items">
+            <span class="badge badge-sync">sync_data.py</span>
+          </div>
+        </div>
+        <div class="flow-arrow">➡</div>
+        <div class="flow-step">
+          <div class="flow-step-title">Central Data</div>
+          <div class="flow-step-items">
+            <span class="badge badge-data">master_spine.json</span>
+          </div>
+        </div>
+        <div class="flow-arrow">➡</div>
+        <div class="flow-step">
+          <div class="flow-step-title">Dashboard Views</div>
+          <div class="flow-step-items">
+            <span class="badge badge-view">Cards</span>
+            <span class="badge badge-view">Spine</span>
+            <span class="badge badge-view">Table</span>
+          </div>
+        </div>
+      </div>`;
   }
 
   // ---------------------------------------------------------------------------

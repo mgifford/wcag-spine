@@ -13,14 +13,7 @@
 
   <link rel="stylesheet" href="assets/css/style.css" />
 
-  <!--
-    Mermaid.js — loaded from CDN.
-    Integrity hash is included for subresource integrity.
-  -->
-  <script
-    src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"
-    crossorigin="anonymous"
-  ></script>
+  <!-- No MermaidJS — using pure HTML/CSS for diagrams -->
 </head>
 <body>
 
@@ -118,11 +111,11 @@
       class="tab-btn"
       role="tab"
       aria-selected="false"
-      data-view="diagram"
-      id="tab-diagram"
-      aria-controls="diagram-view"
-      title="Visualise filtered Success Criteria as a Mermaid.js graph connecting SCs to their automation rules and roles (capped at 20 SCs)"
-    >Diagram</button>
+      data-view="spine"
+      id="tab-spine"
+      aria-controls="spine-view"
+      title="Visualise filtered Success Criteria as a vertical spine connecting SCs to their automation rules and roles"
+    >Spine View</button>
     <button
       class="tab-btn"
       role="tab"
@@ -163,14 +156,14 @@
       Loading accessibility data…
     </div>
 
-    <!-- Diagram view -->
+    <!-- Spine View (formerly Diagram) -->
     <section
-      id="diagram-view"
-      aria-labelledby="tab-diagram"
+      id="spine-view"
+      aria-labelledby="tab-spine"
       role="tabpanel"
       hidden
     >
-      <div id="mermaid-container" aria-label="Mermaid diagram of WCAG Success Criteria spine"></div>
+      <div id="spine-container" aria-label="Vertical spine of WCAG Success Criteria"></div>
     </section>
 
     <!-- Cards view -->
@@ -261,17 +254,7 @@
   <!-- ================================================================ -->
   <!-- Scripts                                                           -->
   <!-- ================================================================ -->
-  <script>
-    // Initialise Mermaid before app.js runs
-    if (window.mermaid) {
-      window.mermaid.initialize({
-        startOnLoad: false,
-        theme: window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "default",
-        securityLevel: "loose",
-        flowchart: { useMaxWidth: true, htmlLabels: true, curve: "basis" },
-      });
-    }
-  </script>
   <script src="assets/js/app.js"></script>
+
 </body>
 </html>

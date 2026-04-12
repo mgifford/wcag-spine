@@ -31,32 +31,14 @@ Key requirements:
 - Smooth-scroll animation must be wrapped in `@media (prefers-reduced-motion: no-preference)`
 - Every permalink icon must have an accessible name via `aria-label` or visually-hidden text
 
-## 4. Mermaid Diagram Accessibility <a href="#4-mermaid-diagram-accessibility" aria-label="Link to 4. Mermaid Diagram Accessibility section">#</a>
-
-A core feature of this project is Mermaid.js diagram generation. Every diagram we produce **must** follow our accessibility best practices:
-
-- **[examples/MERMAID_ACCESSIBILITY_BEST_PRACTICES.md](./examples/MERMAID_ACCESSIBILITY_BEST_PRACTICES.md)** — Normative reference for accessible Mermaid diagrams
-
-Key requirements for all Mermaid diagrams in this project:
-
-```mermaid
-%%accTitle Brief, meaningful title (max 100 characters)
-%%accDescr Detailed description of what the diagram shows
-```
-
-- All diagrams must include `%%accTitle` and `%%accDescr` metadata
-- SVG output must implement [Pattern 11](./examples/MERMAID_ACCESSIBILITY_BEST_PRACTICES.md#2-svg-accessibility-requirements) (`role="img"`, `<title>`, `<desc>`, `aria-labelledby`)
-- Color combinations must meet WCAG contrast ratios in both light and dark modes
-- Decision node labels must be contextual (e.g., "Yes, proceed" not just "Yes")
-
-## 5. Contributor Requirements (The Guardrails) <a href="#5-contributor-requirements-the-guardrails" aria-label="Link to 5. Contributor Requirements (The Guardrails) section">#</a>
+## 4. Contributor Requirements (The Guardrails) <a href="#4-contributor-requirements-the-guardrails" aria-label="Link to 4. Contributor Requirements (The Guardrails) section">#</a>
 
 To contribute to this repo, you must follow these guidelines:
 
 - **Dashboard Accessibility:** The `index.html` dashboard must remain keyboard-navigable and screen reader compatible
 - **Anchor Links:** Follow [examples/ANCHOR_LINKS_ACCESSIBILITY_BEST_PRACTICES.md](./examples/ANCHOR_LINKS_ACCESSIBILITY_BEST_PRACTICES.md) for all in-page navigation
-- **Mermaid Diagrams:** Follow [examples/MERMAID_ACCESSIBILITY_BEST_PRACTICES.md](./examples/MERMAID_ACCESSIBILITY_BEST_PRACTICES.md) for all diagram content
-- **Data Integrity:** `master_spine.json` changes must not break accessible rendering of WCAG success criteria
+- **Visualisations:** All custom components (Spine View, Flow Diagram) must use semantic HTML and SVG-like accessibility patterns
+- **Data Integrity:** `master_spine.json` changes must not break accessible rendering of WCAG success criteria. Data sources must be clearly attributed (Synced vs AI-summarized).
 - **Inclusive Language:** Use person-centered, respectful language throughout
 - **Color Contrast:** All UI elements must maintain WCAG 4.5:1 (text) and 3:1 (non-text) contrast ratios
 
@@ -73,9 +55,9 @@ Please use our [issue tracker](https://github.com/mgifford/wcag-spine/issues/new
 
 The WCAG Spine dashboard (`index.html`) provides:
 
-- **Keyboard navigation** — All interactive elements (filters, cards, diagrams) are keyboard accessible
+- **Keyboard navigation** — All interactive elements (filters, cards, spine nodes) are keyboard accessible
 - **Screen reader support** — Semantic HTML, appropriate ARIA roles, and live regions for dynamic content
-- **Three views** — Cards, Diagram (Mermaid), and Table — each with accessible markup
+- **Three views** — Cards, Spine (HTML), and Table — each with accessible markup
 - **Filter controls** — Labeled form controls for Level, Role, Automation, and Search
 - **Deep-linking** — Direct URL access to any Success Criterion (e.g., `#2.4.11`)
 
@@ -85,7 +67,6 @@ Our CI pipeline validates:
 
 - **Data sync** — `sync_accessibility.yml` runs daily to keep WCAG data current
 - **Dashboard deployment** — GitHub Pages deployment after each sync
-- **Manual testing guidance** — See [examples/MERMAID_ACCESSIBILITY_BEST_PRACTICES.md](./examples/MERMAID_ACCESSIBILITY_BEST_PRACTICES.md) for diagram validation checklist
 
 ## 9. Browser & Assistive Technology Support <a href="#9-browser--assistive-technology-support" aria-label="Link to 9. Browser & Assistive Technology Support section">#</a>
 
@@ -107,7 +88,8 @@ Contributors are encouraged to test the dashboard with:
 
 ## 10. Known Limitations <a href="#10-known-limitations" aria-label="Link to 10. Known Limitations section">#</a>
 
-- **Mermaid diagram view** — The spine graph (first 20 filtered SCs) is a visual representation; complex diagrams may be difficult to navigate by keyboard alone
+- **Spine view** — The spine graph is a visual representation; while keyboard accessible, complex views may be verbose for some users
+- **Data Providence** — While many fields are live-synced from W3C and DHS, some mappings and Trusted Tester descriptions may be AI-summarized and require human verification.
 - **Large data sets** — The full 78-SC view may be verbose for screen readers; use filters to narrow results
 - **Dynamic content** — Filter results update the DOM dynamically; ARIA live regions are used but may vary across screen reader implementations
 
@@ -122,10 +104,10 @@ Contributors are encouraged to test the dashboard with:
 
 We regularly review and update:
 - WCAG conformance as standards evolve (targeting 2.2 AA, monitoring 3.0)
-- Mermaid diagram best practices as the library matures
+- Visualisation components as accessibility patterns mature
 - Tool recommendations and automation examples
 - Inclusive language and terminology
 
 ---
 
-Last updated: 2026-03-06
+Last updated: 2026-04-12 (Data Transparency Update)

@@ -2,7 +2,7 @@
  * WCAG Spine — Dashboard Application
  *
  * Loads master_spine.json, renders the data in three views:
- *  1. Diagram  – Mermaid.js "vertebra" graph
+ *  1. Spine View – Pure HTML/CSS "vertebra" graph
  *  2. Cards    – responsive card grid
  *  3. Table    – sortable data table
  *
@@ -22,14 +22,14 @@
 const DATA_URL = "data/master_spine.json";
 
 /**
- * Maximum number of ARRM task IDs to show inline in a single Mermaid diagram
+ * Maximum number of ARRM task IDs to show inline in the spine view
  * node before appending "+N more".  Must match _ARRM_IDS_IN_NODE in sync_data.py.
  */
 const ARRM_IDS_IN_NODE = 5;
 
 /**
  * Maximum number of Trusted Tester step IDs to show inline in a single Mermaid
- * diagram node.  Must match _TT_IDS_IN_NODE in sync_data.py.
+ * spine node. Must match _TT_IDS_IN_NODE in sync_data.py.
  */
 const TT_IDS_IN_NODE = 4;
 
@@ -276,7 +276,7 @@ let spineData = null;
 /** @type {Record<string, SCEntry>} currently visible subset */
 let filteredSC = {};
 
-let currentView = "cards"; // "cards" | "diagram" | "table"
+let currentView = "cards"; // "cards" | "spine" | "table"
 
 /**
  * Plain-language descriptions shown below the view tabs.
@@ -287,11 +287,9 @@ const VIEW_DESCRIPTIONS = {
            "Each card shows the SC number and title, conformance level, automated test coverage " +
            "(ACT rules, axe-core, Alfa), responsible ARRM roles, and Trusted Tester v5 steps. " +
            "Use this view to explore the full details of individual criteria.",
-  diagram: "Visualise the filtered Success Criteria as a Mermaid.js graph — a \"spine\" " +
-           "that connects each SC to its automation rules on the left and manual-testing roles on the right. " +
-           "Nodes link out to WCAG, ACT, ARRM, and Trusted Tester pages. " +
-           "Use this view to understand relationships at a glance. " +
-           "Performance cap: the diagram renders at most 20 SCs at a time.",
+  spine:   "Visualise the filtered Success Criteria as an interactive HTML spine — " +
+           "a vertical sequence showing each SC connected to its automated " +
+           "coverage and manual testing responsibilities.",
   table:   "Compare all filtered Success Criteria side-by-side in a compact, sortable table. " +
            "Columns cover SC number, title, conformance level, WCAG principle, automated rules, " +
            "ARRM roles, Trusted Tester steps, ARRM tasks, and overall automation coverage. " +
@@ -471,7 +469,7 @@ function switchView(view, updateHash = true) {
   if (tabsEl) tabsEl.hidden = isChecklist;
   const descEl = document.getElementById("view-description");
   if (descEl) descEl.hidden = isChecklist;
-  document.getElementById("diagram-view").hidden   = view !== "diagram";
+  document.getElementById("spine-view").hidden   = view !== "spine";
   document.getElementById("cards-view").hidden     = view !== "cards";
   document.getElementById("table-view").hidden     = view !== "table";
   document.getElementById("act-view").hidden       = view !== "act";
@@ -487,7 +485,7 @@ function switchView(view, updateHash = true) {
 }
 
 function renderCurrentView() {
-  if (currentView === "diagram") renderDiagram();
+  if (currentView === "spine") renderSpineView();
   else if (currentView === "cards") renderCards();
   else if (currentView === "act") renderActRules();
   else if (currentView === "coverage") renderCoverage();
@@ -586,7 +584,10 @@ function buildCard(num, entry) {
     }
     <div class="sc-card-body">
       <div class="sc-col col-auto">
-        <div class="col-header">🤖 Automated Rules</div>
+        <div class="col-header">
+          🤖 Automated Rules
+          ${renderSourceBadge("W3C / Tools")}
+        </div>
         ${actIds.length + axeIds.length + alfaIds.length === 0
           ? `<p class="no-data">No automated rules mapped</p>`
           : `
@@ -611,7 +612,10 @@ function buildCard(num, entry) {
         }
       </div>
       <div class="sc-col col-manual">
-        <div class="col-header">👤 Roles &amp; Testing</div>
+        <div class="col-header">
+          👤 Roles &amp; Testing
+          ${renderSourceBadge("W3C ARRM")}
+        </div>
         ${roles.length === 0
           ? `<p class="no-data">No roles mapped</p>`
           : `<ul class="role-list" aria-label="Responsible roles">
@@ -622,7 +626,7 @@ function buildCard(num, entry) {
           ? `<div class="tt-section">
               <div class="tt-sub-header">
                 🔬 <a href="https://section508coordinators.github.io/TrustedTester/index.html" target="_blank" rel="noopener noreferrer" title="Section 508 Trusted Tester v5 resource">Trusted Tester v5</a>
-                <span class="badge badge-ai" title="Step-to-SC mappings were AI-assisted and require human validation">AI-assisted</span>
+                ${renderSourceBadge(m.tt_source || "Summarized by AI")}
               </div>
               <ul class="step-list" aria-label="Trusted Tester test steps">
                 ${steps.map(s => {
@@ -1279,8 +1283,12 @@ function renderCoverage() {
 
 
 
-function renderDiagram() {
-  const container = document.getElementById("mermaid-container");
+/**
+ * Renders the "Spine View" — a vertical visualisation of WCAG Success Criteria
+ * using pure HTML and CSS instead of MermaidJS.
+ */
+function renderSpineView() {
+  const container = document.getElementById("spine-container");
   const entries = Object.entries(filteredSC);
 
   if (entries.length === 0) {
@@ -1288,147 +1296,98 @@ function renderDiagram() {
     return;
   }
 
-  // Limit diagram to keep Mermaid performant; warn if over threshold
-  const MAX_NODES = 20;
+  // We no longer have the strict 20-node limit of Mermaid, but we'll keep a
+  // generous limit for better scrolling performance.
+  const MAX_NODES = 50;
   const shown = entries.slice(0, MAX_NODES);
   const clipped = entries.length > MAX_NODES;
 
-  const lines = [];
-  lines.push("graph TD");
-  lines.push("  classDef sc fill:#e1f5fe,stroke:#01579b,stroke-width:4px,color:#000");
-  lines.push("  classDef auto fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px,color:#000");
-  lines.push("  classDef manual fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#000");
-  lines.push("  classDef arrm fill:#e8eaf6,stroke:#3949ab,stroke-width:2px,color:#000");
-  lines.push("  classDef tt fill:#e0f2f1,stroke:#00695c,stroke-width:2px,color:#000");
-  lines.push("");
-
-  const prevId = [];
-  shown.forEach(([num, entry], idx) => {
-    const safeNum = num.replace(/\./g, "_");
-    const scId    = `SC_${safeNum}`;
-
-    const a = entry.automation ?? {};
-    const m = entry.manual ?? {};
-    const autoItems = [
-      ...(a.act  ?? []).map(i => `ACT:${sanitiseMermaid(i)}`),
-      ...(a.axe  ?? []).map(i => `axe:${sanitiseMermaid(i)}`),
-      ...(a.alfa ?? []).map(i => sanitiseMermaid(i)),
-    ];
-    const manualItems = [
-      ...(m.roles ?? []).map(r => sanitiseMermaid(r)),
-    ];
-    const arrmTaskIds = (m.arrm_tasks ?? []).map(t => t.id);
-    const ttStepIds   = (m.tt_steps  ?? []).map(s => s.split(" - ")[0]);
-
-    const autoLabel  = autoItems.length
-      ? `🤖 ${autoItems.slice(0, 4).join(", ")}${autoItems.length > 4 ? " …" : ""}`
-      : "🤖 No automated rules";
-    const manualLabel = manualItems.length
-      ? `👤 ${manualItems.slice(0, 3).join(", ")}${manualItems.length > 3 ? " …" : ""}`
-      : "👤 No roles mapped";
-    const arrmLabel = arrmTaskIds.length
-      ? `🎯 ${arrmTaskIds.slice(0, ARRM_IDS_IN_NODE).join(", ")}${arrmTaskIds.length > ARRM_IDS_IN_NODE ? ` +${arrmTaskIds.length - ARRM_IDS_IN_NODE} more` : ""}`
-      : null;
-    const ttLabel = ttStepIds.length
-      ? `🔬 TT: ${ttStepIds.slice(0, TT_IDS_IN_NODE).join(", ")}${ttStepIds.length > TT_IDS_IN_NODE ? ` +${ttStepIds.length - TT_IDS_IN_NODE} more` : ""}`
-      : null;
-
-    const autoId  = `AUTO_${safeNum}`;
-    const manId   = `MAN_${safeNum}`;
-    const arrmId  = `ARRM_${safeNum}`;
-    const ttId    = `TT_${safeNum}`;
-    const autoEsc  = autoLabel.replace(/"/g, "'");
-    const manEsc   = manualLabel.replace(/"/g, "'");
-    const scTitle  = `${num}: ${entry.title}`.replace(/"/g, "'");
-    const lvl      = entry.level;
-
-    lines.push(`  subgraph Row_${safeNum} ["${scTitle} (${lvl})"]`);
-    lines.push("    direction LR");
-    lines.push(`    ${autoId}["${autoEsc}"]:::auto`);
-    lines.push(`    ${scId}(("${num}")):::sc`);
-    lines.push(`    ${manId}["${manEsc}"]:::manual`);
-    lines.push(`    ${autoId} --- ${scId} --- ${manId}`);
-    if (arrmLabel) {
-      const arrmEsc = arrmLabel.replace(/"/g, "'");
-      lines.push(`    ${arrmId}["${arrmEsc}"]:::arrm`);
-      lines.push(`    ${scId} --- ${arrmId}`);
-    }
-    if (ttLabel) {
-      const ttEsc = ttLabel.replace(/"/g, "'");
-      lines.push(`    ${ttId}["${ttEsc}"]:::tt`);
-      lines.push(`    ${scId} --- ${ttId}`);
-    }
-    lines.push("  end");
-    lines.push("");
-
-    // Add clickable links for SC and automation nodes
-    const wcagUrl = entry.url;
-    if (wcagUrl) {
-      lines.push(`  click ${scId} href "${wcagUrl}" _blank`);
-      if (autoItems.length > 0) {
-        lines.push(`  click ${autoId} href "${wcagUrl}" _blank`);
-      }
-      lines.push("");
-    }
-
-    // ARRM click → ARRM tasks page section
-    if (arrmLabel) {
-      const arrmTaskUrl = (m.arrm_tasks[0]?.category_url) ?? "https://www.w3.org/WAI/planning/arrm/tasks/";
-      lines.push(`  click ${arrmId} href "${arrmTaskUrl}" _blank`);
-      lines.push("");
-    }
-
-    // TT click → most relevant TrustedTester section page for this SC
-    if (ttLabel) {
-      lines.push(`  click ${ttId} href "${ttScUrl(num)}" _blank`);
-      lines.push("");
-    }
-
-    // Chain spine vertically
-    if (idx > 0) {
-      const prevScId = `SC_${prevId[prevId.length - 1]}`;
-      lines.push(`  ${prevScId} ==> ${scId}`);
-      lines.push("");
-    }
-    prevId.push(safeNum);
-  });
-
-  const definition = lines.join("\n");
+  container.innerHTML = "";
 
   if (clipped) {
     const notice = document.createElement("p");
-    notice.style.cssText = "text-align:center;color:#e65100;font-size:.85rem;margin-bottom:8px;";
-    notice.textContent = `⚠️ Diagram shows first ${MAX_NODES} of ${entries.length} filtered SCs. Use the Cards or Table view for all results.`;
-    container.innerHTML = "";
+    notice.className = "spine-notice";
+    notice.textContent = `⚠️ Spine view shows first ${MAX_NODES} of ${entries.length} filtered SCs. Use the Cards or Table view for all results.`;
     container.appendChild(notice);
-  } else {
-    container.innerHTML = "";
   }
 
-  const mermaidDiv = document.createElement("div");
-  mermaidDiv.className = "mermaid";
-  mermaidDiv.textContent = definition;
-  container.appendChild(mermaidDiv);
+  const spineWrapper = document.createElement("div");
+  spineWrapper.className = "spine-wrapper";
 
-  // Re-render Mermaid
-  if (window.mermaid) {
-    window.mermaid.run({ nodes: [mermaidDiv] }).catch(err => {
-      console.error("Mermaid render error:", err);
-      mermaidDiv.innerHTML = `<pre style="color:red;white-space:pre-wrap">${escapeHTML(definition)}</pre>`;
-    });
-  }
+  shown.forEach(([num, entry], idx) => {
+    const a = entry.automation ?? {};
+    const m = entry.manual ?? {};
+
+    const autoItems = [
+      ...(a.act  ?? []).map(i => `ACT:${i}`),
+      ...(a.axe  ?? []).map(i => `axe:${i}`),
+      ...(a.alfa ?? []).map(i => i),
+    ];
+    const roles = m.roles ?? [];
+    const arrmTaskIds = (m.arrm_tasks ?? []).map(t => t.id);
+    const ttStepIds   = (m.tt_steps  ?? []).map(s => s.split(" - ")[0]);
+
+    const row = document.createElement("div");
+    row.className = "spine-row";
+
+    // 🤖 Left: Automation
+    const autoCol = document.createElement("div");
+    autoCol.className = "spine-col spine-col-left";
+    if (autoItems.length > 0) {
+      const autoList = autoItems.slice(0, 4).map(i => `<span class="spine-tag spine-tag-auto">${escapeHTML(i)}</span>`).join("");
+      autoCol.innerHTML = `
+        <div class="spine-node spine-node-auto">
+          <div class="spine-node-label">🤖 ${autoList}${autoItems.length > 4 ? " …" : ""}</div>
+        </div>`;
+    } else {
+      autoCol.innerHTML = `<div class="spine-node spine-node-empty">🤖 None</div>`;
+    }
+
+    // 🔵 Middle: SC Vertebra
+    const midCol = document.createElement("div");
+    midCol.className = "spine-col spine-col-mid";
+    midCol.innerHTML = `
+      <a href="${escapeAttr(entry.url ?? "#")}" class="spine-vertebra" 
+         target="_blank" rel="noopener noreferrer"
+         title="${escapeAttr(entry.title)}">
+        <span class="spine-sc-num">${num}</span>
+      </a>
+      ${idx < shown.length - 1 ? '<div class="spine-connector"></div>' : ""}
+    `;
+
+    // 👤 Right: Manual
+    const manCol = document.createElement("div");
+    manCol.className = "spine-col spine-col-right";
+    const roleTags = roles.slice(0, 2).map(r => `<span class="spine-tag spine-tag-role">${escapeHTML(r)}</span>`).join("");
+    const arrmText = arrmTaskIds.length ? `🎯 ${arrmTaskIds.slice(0, ARRM_IDS_IN_NODE).join(", ")}${arrmTaskIds.length > ARRM_IDS_IN_NODE ? ` +${arrmTaskIds.length - ARRM_IDS_IN_NODE}` : ""}` : "";
+    const ttText   = ttStepIds.length ? `🔬 TT: ${ttStepIds.slice(0, TT_IDS_IN_NODE).join(", ")}` : "";
+
+    manCol.innerHTML = `
+      <div class="spine-node spine-node-manual">
+        <div class="spine-node-label">
+          <div class="spine-manual-roles">${roleTags}${roles.length > 2 ? " …" : ""}</div>
+          <div class="spine-manual-tasks">${escapeHTML(arrmText)}</div>
+          <div class="spine-manual-tt">${escapeHTML(ttText)}</div>
+        </div>
+      </div>`;
+
+    row.appendChild(autoCol);
+    row.appendChild(midCol);
+    row.appendChild(manCol);
+    spineWrapper.appendChild(row);
+  });
+
+  container.appendChild(spineWrapper);
 }
 
-function sanitiseMermaid(str) {
-  return String(str).replace(/["\(\)\[\]{}<>]/g, "").replace(/-/g, " ").trim();
-}
+// Mermaid sanitisation no longer needed as we use pure HTML
 
 /* ------------------------------------------------------------------ */
 /*  Hash-based navigation / deep linking                               */
 /* ------------------------------------------------------------------ */
 
 function handleHashNavigation() {
-  const hash = window.location.hash.slice(1); // e.g. "cards", "diagram", "2.4.11", "checklist/111"
+  const hash = window.location.hash.slice(1); // e.g. "cards", "spine", "2.4.11", "checklist/111"
   if (!hash) {
     // When the browser back button lands on a hash-less URL while the
     // checklist is displayed (e.g. the user opened the site without a hash
@@ -1448,7 +1407,7 @@ function handleHashNavigation() {
   }
 
   // If the hash is a known tab name, switch to that tab
-  const TAB_VIEWS = ["cards", "diagram", "table", "act", "coverage"];
+  const TAB_VIEWS = ["cards", "spine", "table", "act", "coverage"];
   if (TAB_VIEWS.includes(hash)) {
     const wasChecklist = currentView === "checklist";
     switchView(hash);
@@ -1775,12 +1734,11 @@ function renderChecklist(scKey, entry) {
     </header>
 
     <div class="checklist-body">
-      ${steps.length > 0 ? `
       <section class="checklist-section" aria-labelledby="checklist-tt-heading">
         <h3 id="checklist-tt-heading" class="checklist-section-heading">
           🔬 Trusted Tester v5 Steps
           <span class="checklist-count" aria-label="${steps.length} steps">${steps.length}</span>
-          <span class="badge badge-ai" title="Step-to-SC mappings were AI-assisted and require human validation">AI-assisted</span>
+          ${renderSourceBadge(m.tt_source || "Summarized by AI")}
         </h3>
         <ul class="checklist-list" aria-label="Trusted Tester steps for SC ${escapeHTML(scKey)}">
           ${ttItems}
@@ -1792,6 +1750,7 @@ function renderChecklist(scKey, entry) {
         <h3 id="checklist-arrm-heading" class="checklist-section-heading">
           📋 ARRM Tasks
           <span class="checklist-count" aria-label="${arrmTasks.length} tasks">${arrmTasks.length}</span>
+          ${renderSourceBadge("W3C ARRM")}
         </h3>
         <ul class="checklist-list" aria-label="ARRM tasks for SC ${escapeHTML(scKey)}">
           ${arrmItems}
@@ -1806,6 +1765,7 @@ function renderChecklist(scKey, entry) {
             aria-label="${actIds.length + axeIds.length + alfaIds.length} rules">
             ${actIds.length + axeIds.length + alfaIds.length}
           </span>
+          ${renderSourceBadge("W3C / Tools")}
         </h3>
         <p class="checklist-auto-note">
           These rules run automatically — verify each engine is included in your test suite.
@@ -1862,7 +1822,7 @@ function showLoading(show) {
   document.getElementById("loading").hidden = !show;
   document.getElementById("view-tabs").hidden = show;
   document.getElementById("view-description").hidden = show;
-  document.getElementById("diagram-view").hidden = show || currentView !== "diagram";
+  document.getElementById("spine-view").hidden = show || currentView !== "spine";
   document.getElementById("cards-view").hidden   = show || currentView !== "cards";
   document.getElementById("table-view").hidden   = show || currentView !== "table";
   document.getElementById("act-view").hidden     = show || currentView !== "act";
@@ -1900,4 +1860,20 @@ function escapeAttr(str) {
   return String(str)
     .replace(/&/g, "&amp;")
     .replace(/"/g, "&quot;");
+}
+
+/**
+ * Returns an accessible HTML badge for a data source.
+ * @param {string} source - e.g. "Summarized by AI" or "DHS Trusted Tester v5"
+ * @returns {string}
+ */
+function renderSourceBadge(source) {
+  if (!source) return "";
+  const isAI = source.toLowerCase().includes("ai");
+  const className = isAI ? "badge-ai" : "badge-source";
+  const icon = isAI ? "🤖" : "📥";
+  const label = isAI ? "Summarized by AI" : `Sourced from ${source}`;
+  return `<span class="badge ${className}" title="${escapeAttr(label)}">
+    <span aria-hidden="true">${icon}</span> ${escapeHTML(source)}
+  </span>`;
 }

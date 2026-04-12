@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from __future__ import annotations
 """
 WCAG Spine - Data Orchestrator
 Synchronizes data from W3C ARRM, ACT Rules, Axe-core, and Alfa
@@ -252,20 +253,6 @@ ARRM_ROLE_URLS: dict[str, str] = {
     "Visual Design":              f"{ARRM_BASE_URL}/visual-designer/",
 }
 
-# Maps role names (as they appear in master_spine.json manual.roles) to short
-# abbreviations used as Mermaid node-ID suffixes.  Both the short form used by
-# arrm-wcag-sc.csv and the long form used by arrm-all-tasks.csv are listed so
-# that either can appear in the data without breaking node-ID generation.
-ROLE_ABBREVIATIONS: dict[str, str] = {
-    "Business":                    "BUS",
-    "Content Authoring":           "CA",
-    "Front-End Development":       "FE",
-    "UX Design":                   "UX",
-    "User Experience (UX) Design": "UX",
-    "User Experience Design":      "UX",
-    "Visual Design":               "VD",
-}
-
 # ---------------------------------------------------------------------------
 # Paths
 # ---------------------------------------------------------------------------
@@ -273,22 +260,6 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR = REPO_ROOT / "data"
 SEED_FILE = DATA_DIR / "master_spine.json"
 OUTPUT_FILE = DATA_DIR / "master_spine.json"
-MERMAID_FILE = REPO_ROOT / "wcag-sc-roles-diagram.md"
-
-# Per-principle diagram files (split to stay within GitHub's Mermaid size limit)
-MERMAID_PRINCIPLE_FILES: dict[str, Path] = {
-    "1": REPO_ROOT / "wcag-perceivable-diagram.md",
-    "2": REPO_ROOT / "wcag-operable-diagram.md",
-    "3": REPO_ROOT / "wcag-understandable-diagram.md",
-    "4": REPO_ROOT / "wcag-robust-diagram.md",
-}
-
-PRINCIPLE_NAMES: dict[str, str] = {
-    "1": "Perceivable",
-    "2": "Operable",
-    "3": "Understandable",
-    "4": "Robust",
-}
 
 # Ordered list of the tool engines tracked in ``act_implementations``.  Used
 # as the canonical key order for all per-engine dicts in this module.
@@ -371,6 +342,49 @@ def normalise_sc(raw: str) -> str | None:
     if match:
         return f"{match.group(1)}.{match.group(2)}.{match.group(3)}"
     return None
+
+
+def fetch_tt_steps() -> dict[str, list[str]]:
+    """
+    Scrape Trusted Tester v5 test identifiers and titles from the HTML pages.
+    Returns mapping of SC -> ["Test ID: Title", ...].
+    """
+    sc_to_steps: dict[str, list[str]] = {}
+    base_url = "https://section508coordinators.github.io/TrustedTester/"
+    
+    # We only fetch each unique page once
+    unique_pages = sorted(set(TT_SC_PAGE.values()))
+    page_to_content: dict[str, str] = {}
+    
+    print(f"  → Scraping {len(unique_pages)} Trusted Tester pages …")
+    for page in unique_pages:
+        url = base_url + page
+        content = fetch_text(url)
+        if content:
+            page_to_content[page] = content
+
+    for sc, page in TT_SC_PAGE.items():
+        content = page_to_content.get(page)
+        if not content:
+            continue
+            
+        # Extract checks for this specific SC. 
+        # Pattern in HTML: <td>1.1.1-some-slug</td> \s* <td>7.A</td>
+        sc_pattern = sc.replace(".", r"\.")
+        pattern = r'<td>(' + sc_pattern + r'-[a-zA-Z0-9\-]+)</td>\s*<td>([0-9A-Z\.]+)</td>'
+        matches = re.finditer(pattern, content, re.DOTALL | re.IGNORECASE)
+        
+        steps = []
+        for m in matches:
+            # Derive a clean title from the slug (e.g. "meaningful-image-name" -> "Meaningful Image Name")
+            slug = m.group(1).replace(sc + "-", "").replace("-", " ").title()
+            test_id = m.group(2)
+            steps.append(f"{test_id} - {slug}")
+        
+        if steps:
+            sc_to_steps[sc] = sorted(list(set(steps)))
+            
+    return sc_to_steps
 
 
 def load_seed() -> dict:
@@ -1130,6 +1144,7 @@ def merge_into_spine(
     axe_map: dict | None = None,
     alfa_map: dict | None = None,
     fpc_map: dict | None = None,
+    tt_map: dict | None = None,
 ) -> None:
     """Merge fetched data into the in-memory spine (mutates in place).
 
@@ -1143,6 +1158,7 @@ def merge_into_spine(
     axe_map:             SC → list of axe-core rule IDs (directly fetched).
     alfa_map:            SC → list of Alfa rule IDs (directly fetched).
     fpc_map:             SC → list of Section 508 FPC codes (e.g. ["WV", "LV"]).
+    tt_map:              SC → list of Trusted Tester step strings (e.g. ["7.A - Image Name"]).
 
     Automation propagation
     ----------------------
@@ -1238,267 +1254,22 @@ def merge_into_spine(
         elif "fpc" not in entry:
             entry["fpc"] = []
 
+        # --- Trusted Tester steps ---
+        # Overwrite if we fetched live steps; otherwise keep seed/AI summary.
+        if tt_map and sc_num in tt_map:
+            entry["manual"]["tt_steps"] = tt_map[sc_num]
+            # Flag that these steps are sourced from DHS
+            entry["manual"]["tt_source"] = "DHS Trusted Tester v5"
+        else:
+            if "tt_source" not in entry["manual"]:
+                entry["manual"]["tt_source"] = "Summarized by AI"
+
     # --- Store updated ACT implementation data in meta ---
     # Write back the combined (seed + fresh) implementation map so future syncs
     # can use accumulated data as their baseline.
     existing_meta_impl = spine.setdefault("meta", {}).setdefault("act_implementations", {})
     for act_id, impl in combined_impl.items():
         existing_meta_impl[act_id] = impl
-
-
-# ---------------------------------------------------------------------------
-# Mermaid sanitisation helpers (used by the frontend generator too)
-# ---------------------------------------------------------------------------
-
-def sanitise_id(text: str) -> str:
-    """Strip characters that break Mermaid node IDs."""
-    return re.sub(r"[^A-Za-z0-9_]", "_", text)
-
-
-def sanitise_label(text: str) -> str:
-    """Wrap text in double-quotes for safe Mermaid labels."""
-    cleaned = text.replace('"', "'")
-    return f'["{cleaned}"]'
-
-
-# ---------------------------------------------------------------------------
-# Mermaid diagram generator
-# ---------------------------------------------------------------------------
-
-# Maximum ARRM task IDs to show inline in a single diagram node before
-# appending "+N more".
-_ARRM_IDS_IN_NODE = 5
-
-# Maximum Trusted Tester step IDs to show inline in a single diagram node.
-_TT_IDS_IN_NODE = 4
-
-
-_LEGEND = (
-    "**Legend**\n"
-    "\n"
-    "| Colour | Meaning |\n"
-    "|--------|---------|\n"
-    "| 🔵 Blue | Success Criterion |\n"
-    "| 🟠 Orange | Responsible Role |\n"
-    "| 🟣 Purple | ACT Automated Rules |\n"
-    "| 🟡 Yellow | AXE Automated Rules |\n"
-    "| 🩷 Pink | Alfa Automated Rules |\n"
-    "| 🟦 Indigo | ARRM Task IDs |\n"
-    "| 🟩 Teal | Trusted Tester v5 |\n"
-)
-
-_DIAGRAM_INTRO = (
-    "SC nodes form a **vertical spine** running top to bottom in the centre.\n"
-    "Automated testing tools (ACT, AXE, Alfa) branch off to the **left** of each SC.\n"
-    "Responsible roles branch off to the **right** of each SC.\n"
-    "ARRM task IDs and Trusted Tester steps branch off from each SC node.\n"
-    "(`graph LR` is used so that root SC nodes stack vertically, not horizontally.)\n"
-)
-
-
-def _build_principle_diagram(sc_dict: dict, axe_version: str = AXE_VERSION_FALLBACK) -> str:
-    """
-    Build the Mermaid ``graph LR`` block for the given subset of SCs.
-
-    Returns the full diagram as a string (including the fenced code block).
-    All ``click`` directives are appended after the node definitions so the
-    node declarations stay readable.
-
-    ``axe_version`` is the axe-core major.minor string (e.g. ``"4.10"``) used
-    to build versioned Deque University rule URLs.
-    """
-    node_lines: list[str] = []
-    click_lines: list[str] = []
-
-    node_lines.append("```mermaid")
-    node_lines.append("graph LR")
-    node_lines.append("    classDef sc   fill:#e1f5fe,stroke:#01579b,color:#000")
-    node_lines.append("    classDef role fill:#fff3e0,stroke:#e65100,color:#000")
-    node_lines.append("    classDef act  fill:#f3e5f5,stroke:#6a1b9a,color:#000")
-    node_lines.append("    classDef axe  fill:#fffde7,stroke:#f57f17,color:#000")
-    node_lines.append("    classDef alfa fill:#fce4ec,stroke:#880e4f,color:#000")
-    node_lines.append("    classDef arrm fill:#e8eaf6,stroke:#3949ab,color:#000")
-    node_lines.append("    classDef tt   fill:#e0f2f1,stroke:#00695c,color:#000")
-    node_lines.append("")
-
-    for sc_num, entry in sc_dict.items():
-        safe = sc_num.replace(".", "_")
-        sc_node = f"N{safe}"
-
-        a = entry.get("automation", {})
-        m = entry.get("manual", {})
-        act_ids    = a.get("act", [])
-        axe_ids    = a.get("axe", [])
-        alfa_ids   = a.get("alfa", [])
-        roles      = m.get("roles", [])
-        tt_steps   = m.get("tt_steps", [])
-        arrm_tasks = m.get("arrm_tasks", [])
-
-        node_lines.append(f"    {sc_node}(({sc_num})):::sc")
-
-        # --- Automation nodes (point INTO the SC) ---
-        if act_ids:
-            act_label = "ACT: " + ", ".join(act_ids)
-            node_lines.append(f'    A_act_{safe}["{act_label}"]:::act --> {sc_node}')
-            click_lines.append(
-                f'    click A_act_{safe} href '
-                f'"https://www.w3.org/WAI/standards-guidelines/act/rules/{act_ids[0]}/" _blank'
-            )
-
-        if axe_ids:
-            axe_label = "AXE: " + ", ".join(axe_ids)
-            node_lines.append(f'    A_axe_{safe}["{axe_label}"]:::axe --> {sc_node}')
-            click_lines.append(
-                f'    click A_axe_{safe} href '
-                f'"https://dequeuniversity.com/rules/axe/{axe_version}/{axe_ids[0]}" _blank'
-            )
-
-        if alfa_ids:
-            alfa_label = "Alfa: " + ", ".join(alfa_ids)
-            node_lines.append(f'    A_alfa_{safe}["{alfa_label}"]:::alfa --> {sc_node}')
-            click_lines.append(
-                f'    click A_alfa_{safe} href '
-                f'"https://alfa.siteimprove.com/rules/{alfa_ids[0].lower()}" _blank'
-            )
-
-        # --- Role nodes (point OUT of the SC) ---
-        seen_abbrs: set[str] = set()
-        for role in roles:
-            abbr = ROLE_ABBREVIATIONS.get(role)
-            if abbr is None:
-                # Fallback: initials of each word
-                abbr = "".join(w[0] for w in role.split() if w).upper()
-            # Deduplicate within this SC (two roles mapping to same abbr is unlikely
-            # but guard against it to keep IDs unique).
-            unique_abbr = abbr
-            suffix = 2
-            while unique_abbr in seen_abbrs:
-                unique_abbr = f"{abbr}{suffix}"
-                suffix += 1
-            seen_abbrs.add(unique_abbr)
-            role_node = f"R{safe}_{unique_abbr}"
-            safe_role_label = role.replace('"', "'")
-            node_lines.append(f'    {sc_node} --> {role_node}["{safe_role_label}"]:::role')
-
-        # --- ARRM task-IDs node ---
-        if arrm_tasks:
-            task_ids = [t["id"] for t in arrm_tasks]
-            if len(task_ids) <= _ARRM_IDS_IN_NODE:
-                ids_label = ", ".join(task_ids)
-            else:
-                ids_label = (
-                    ", ".join(task_ids[:_ARRM_IDS_IN_NODE])
-                    + f" +{len(task_ids) - _ARRM_IDS_IN_NODE} more"
-                )
-            arrm_node = f"T_{safe}"
-            node_lines.append(f'    {sc_node} --> {arrm_node}["ARRM: {ids_label}"]:::arrm')
-            category_url = arrm_tasks[0].get(
-                "category_url", "https://www.w3.org/WAI/planning/arrm/tasks/"
-            )
-            click_lines.append(
-                f'    click {arrm_node} href "{category_url}" _blank'
-            )
-
-        # --- Trusted Tester node ---
-        if tt_steps:
-            step_ids = [s.split(" - ")[0] for s in tt_steps]
-            if len(step_ids) <= _TT_IDS_IN_NODE:
-                tt_label = "TT: " + ", ".join(step_ids)
-            else:
-                tt_label = (
-                    "TT: " + ", ".join(step_ids[:_TT_IDS_IN_NODE])
-                    + f" +{len(step_ids) - _TT_IDS_IN_NODE} more"
-                )
-            tt_node = f"TT_{safe}"
-            node_lines.append(f'    {sc_node} --> {tt_node}["{tt_label}"]:::tt')
-            click_lines.append(
-                f'    click {tt_node} href "{_tt_sc_url(sc_num)}" _blank'
-            )
-
-        # SC click
-        sc_url = entry.get("url", "")
-        if sc_url:
-            click_lines.append(f'    click {sc_node} href "{sc_url}" _blank')
-
-        node_lines.append("")
-
-    diagram_lines = node_lines + click_lines + ["```"]
-    return "\n".join(diagram_lines) + "\n"
-
-
-def generate_mermaid_md(spine: dict, axe_version: str = AXE_VERSION_FALLBACK) -> None:
-    """
-    Regenerate the per-principle Mermaid diagram files from the in-memory spine.
-
-    GitHub enforces a maximum diagram text size, so a single diagram covering
-    all 86 WCAG 2.2 SCs exceeds that limit.  Instead we generate one file per
-    WCAG principle (Perceivable / Operable / Understandable / Robust) plus an
-    overview index (wcag-sc-roles-diagram.md) that links to each principle file.
-
-    Layout (per diagram)
-    --------------------
-    graph LR
-      AUTO  -->  SC  -->  ROLE(s)
-                  |
-                 ARRM task-IDs node  (indigo)
-                  |
-                 TT steps node       (teal)
-
-    All ``click`` directives are collected and written at the end of the
-    diagram block so the node definitions stay readable.
-
-    ``axe_version`` is the axe-core major.minor string (e.g. ``"4.10"``) used
-    to build versioned Deque University rule URLs.
-    """
-    sc_dict = spine.get("success_criteria", {})
-
-    # --- Write one diagram file per WCAG principle ---
-    for prefix, out_path in MERMAID_PRINCIPLE_FILES.items():
-        principle_name = PRINCIPLE_NAMES[prefix]
-        principle_scs = {
-            num: entry
-            for num, entry in sc_dict.items()
-            if num.startswith(f"{prefix}.")
-        }
-
-        header = (
-            f"# WCAG 2.2 Principle {prefix}: {principle_name} – Roles & Testing\n"
-            "\n"
-            f"Success Criteria {prefix}.x.x ({len(principle_scs)} SCs).\n"
-            "\n"
-        ) + _DIAGRAM_INTRO + "\n" + _LEGEND + "\n"
-
-        content = header + _build_principle_diagram(principle_scs, axe_version=axe_version)
-        out_path.write_text(content, encoding="utf-8")
-        print(f"  → Wrote {out_path} ({len(principle_scs)} SCs, {len(content)} chars)")
-
-    # --- Write the overview index ---
-    index_lines = [
-        "# WCAG 2.2 Success Criteria – Roles & Testing",
-        "",
-        "The full diagram has been split into four files by WCAG principle to stay",
-        "within GitHub's maximum Mermaid diagram size.",
-        "",
-        "| Principle | File | SCs |",
-        "|-----------|------|-----|",
-    ]
-    for prefix, out_path in MERMAID_PRINCIPLE_FILES.items():
-        principle_name = PRINCIPLE_NAMES[prefix]
-        principle_scs = [num for num in sc_dict if num.startswith(f"{prefix}.")]
-        index_lines.append(
-            f"| {prefix}. {principle_name} | [{out_path.name}]({out_path.name}) | {len(principle_scs)} |"
-        )
-
-    index_lines += [
-        "",
-        "---",
-        "",
-        _DIAGRAM_INTRO,
-        _LEGEND,
-    ]
-
-    MERMAID_FILE.write_text("\n".join(index_lines) + "\n", encoding="utf-8")
-    print(f"  → Wrote {MERMAID_FILE} (index, {len(sc_dict)} total SCs)")
 
 
 # ---------------------------------------------------------------------------
@@ -1567,6 +1338,13 @@ def main() -> None:
     else:
         print("  → FPC mapping unavailable; using seed data")
 
+    print("Fetching Trusted Tester v5 steps …")
+    tt_map = fetch_tt_steps()
+    if tt_map:
+        print(f"  → {sum(len(v) for v in tt_map.values())} TT steps found across {len(tt_map)} SCs")
+    else:
+        print("  → Trusted Tester scrape unavailable; using seed data")
+
     print("Fetching Alfa EARL implementation report …")
     earl_alfa_map, earl_act_impl = fetch_earl_alfa_mappings(act_map)
     if earl_alfa_map:
@@ -1603,6 +1381,7 @@ def main() -> None:
         axe_map=axe_map or {},
         alfa_map=alfa_map or {},
         fpc_map=fpc_map or {},
+        tt_map=tt_map or {},
     )
 
     spine["meta"]["generated"] = date.today().isoformat()
@@ -1629,8 +1408,9 @@ def main() -> None:
         ],
         "ai_generated_note": (
             "Manual testing procedures (Trusted Tester steps, ARRM tasks, and role "
-            "assignments) were initially generated with AI assistance and require human "
-            "validation before use in production."
+            "assignments) were initially generated with AI assistance. This project is "
+            "actively transitioning to live-synced data; check the 'source' attribute "
+            "on individual components for verification."
         ),
         "upstream_sourced_fields": [
             "automation.act",
@@ -1651,9 +1431,6 @@ def main() -> None:
 
     total_sc = len(spine.get("success_criteria", {}))
     print(f"Done — {total_sc} Success Criteria written to {OUTPUT_FILE}")
-
-    print("Generating Mermaid diagram …")
-    generate_mermaid_md(spine, axe_version=axe_version)
 
 
 if __name__ == "__main__":
