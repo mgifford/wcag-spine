@@ -9,10 +9,18 @@
 ---
 
 > [!WARNING]
-> **🚧 Experimental — AI-generated content, not yet validated**
+> **🚧 Experimental — AI-assisted code, not yet fully validated**
 >
-> Most of this site was generated with AI assistance. **All content needs to be
-> validated in real-world conditions before it is relied upon.**
+> The **code** for this site (HTML/CSS/JS frontend, Python data-pipeline, CI workflows,
+> and documentation) was largely written with AI assistance. The **source data** — WCAG
+> 2.2 Success Criteria, ACT Rules, Axe-core/Alfa rule IDs, ARRM roles, and Trusted
+> Tester steps — comes directly from authoritative W3C and DHS sources (see
+> [Data Sources](#data-sources-) below) and is **not** AI-generated.
+>
+> Automated tests (Playwright + Axe-core, Lighthouse CI, and Python unit tests) run on
+> every commit and are listed in [Testing & Accessibility Audits](#testing--accessibility-audits).
+> However, the full codebase has **not** yet received a comprehensive human code review,
+> and real-world edge cases may not be covered. Use with appropriate caution.
 >
 > - Impacts may vary significantly depending on where and how the tool is implemented.
 > - People with experience conducting studies on accessibility impact and the cost of
@@ -184,12 +192,32 @@ Transparency about AI use is a core commitment of this project. Below is a recor
 that has been used, and how it was used. If you contribute using an AI tool, please add it to this
 table (see [`AGENTS.md`](AGENTS.md) for instructions).
 
+### What AI did — and did not — generate
+
+To answer the natural question *"which parts of this project are AI-generated?"*:
+
+| Layer | AI-generated? | Notes |
+|-------|:---:|-------|
+| **Source data** (WCAG 2.2 SCs, ACT Rules, Axe-core/Alfa IDs, ARRM roles, Trusted Tester steps) | ❌ No | Fetched directly from authoritative W3C and DHS sources by the sync script |
+| **Data-pipeline code** (`scripts/sync_data.py`, CI workflows) | ✅ Yes | Written with AI assistance; covered by Python unit tests in `tests/` |
+| **Frontend code** (`index.html`, `assets/js/app.js`, `assets/css/style.css`) | ✅ Yes | Written with AI assistance; covered by Playwright + Axe-core + Lighthouse CI |
+| **Documentation** (`README.md`, `ACCESSIBILITY.md`, `AGENTS.md`, etc.) | ✅ Yes | Authored with AI assistance; reviewed and edited by the project maintainer |
+
+### Human review & testing
+
+The following safeguards are in place for AI-generated code:
+
+- **Automated CI** runs on every commit: Playwright + Axe-core (0 violations required), Lighthouse CI (100% accessibility score required), and Python unit tests (`python3 -m pytest`).
+- **Daily data sync** re-runs `sync_data.py` against live W3C/DHS endpoints and redeploys; failures are visible in the [Actions tab](https://github.com/mgifford/wcag-spine/actions).
+- **Maintainer review** — all AI-generated PRs are reviewed by the project maintainer before merging.
+- **Not yet fully audited** — a comprehensive independent human code review of the full codebase has not yet been completed. Contributions and reviews are welcome via the [issue queue](https://github.com/mgifford/wcag-spine/issues).
+
 ### AI tools used in development
 
-| Tool | Role |
-|------|------|
-| **GitHub Copilot** (Coding Agent / `copilot-swe-agent`) | Code generation, documentation authoring, PR automation, and project scaffolding throughout the build of this project |
-| **Antigravity** (AI Coding Assistant) | Removal of MermaidJS dependency; Implementation of pure HTML/CSS Spine View and data flow visualisations; Implementation of live Trusted Tester v5 scraper and data provenance source badges; Implementation of theme-aware (Light/Dark) accessibility CI/CD pipeline (Playwright + Axe-core + Lighthouse); Remediation of WCAG 2.2 AA violations (contrast, nested interactive, target-size) |
+| Tool | Layer(s) affected | Role |
+|------|:---:|------|
+| **GitHub Copilot** (Coding Agent / `copilot-swe-agent`) | Frontend · Data pipeline · Documentation | Code generation, documentation authoring, PR automation, and project scaffolding throughout the build of this project |
+| **Antigravity** (AI Coding Assistant) | Frontend · Data pipeline | Removal of MermaidJS dependency; Implementation of pure HTML/CSS Spine View and data flow visualisations; Implementation of live Trusted Tester v5 scraper and data provenance source badges; Implementation of theme-aware (Light/Dark) accessibility CI/CD pipeline (Playwright + Axe-core + Lighthouse); Remediation of WCAG 2.2 AA violations (contrast, nested interactive, target-size) |
 
 ### Runtime AI
 
