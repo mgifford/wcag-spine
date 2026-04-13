@@ -110,7 +110,7 @@ Contributors are encouraged to test the dashboard with:
 ## 10. Known Limitations <a href="#10-known-limitations" aria-label="Link to 10. Known Limitations section">#</a>
 
 - **Spine view** — The spine graph is a visual representation; while keyboard accessible, complex views may be verbose for some users
-- **Data Providence** — While many fields are live-synced from W3C and DHS, some mappings and Trusted Tester descriptions may be AI-summarized and require human verification.
+- **Data Provenance** — Source data (WCAG 2.2 SCs, ACT Rules, Axe-core/Alfa IDs, ARRM roles, Trusted Tester steps) is live-synced from W3C and DHS and is not AI-generated. The code that fetches and merges this data was written with AI assistance and has automated test coverage, but has not yet received a comprehensive independent human code review. See the [AI Disclosure](README.md#ai-disclosure) section in README.md for full details.
 - **Large data sets** — The full 78-SC view may be verbose for screen readers; use filters to narrow results
 - **Dynamic content** — Filter results update the DOM dynamically; ARIA live regions are used but may vary across screen reader implementations
 
