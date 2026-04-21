@@ -207,6 +207,133 @@ class TestExtractImplementations(unittest.TestCase):
         result = sync_data._extract_implementations(rule)
         self.assertEqual(result["axe"], ["rule-x"])
 
+    # --- consistency metadata ---
+
+    def test_dict_format_captures_consistency(self):
+        """Consistency level is preserved for each rule ID in dict format."""
+        rule = {
+            "implementations": {
+                "consistent": {
+                    "axe-core": [{"id": "image-alt"}],
+                    "Alfa": [{"id": "SIA-R2"}],
+                }
+            }
+        }
+        result = sync_data._extract_implementations(rule)
+        self.assertIn("consistency", result)
+        self.assertEqual(result["consistency"].get("image-alt"), "consistent")
+        self.assertEqual(result["consistency"].get("SIA-R2"), "consistent")
+
+    def test_dict_format_best_wins_for_duplicate_rule(self):
+        """When a rule appears under both consistent and partial, consistent wins."""
+        rule = {
+            "implementations": {
+                "partial":    {"axe-core": [{"id": "rule-1"}]},
+                "consistent": {"axe-core": [{"id": "rule-1"}]},
+            }
+        }
+        result = sync_data._extract_implementations(rule)
+        self.assertEqual(result["consistency"].get("rule-1"), "consistent")
+
+    def test_dict_format_partial_level_captured(self):
+        """Partial consistency is stored when that is the only level."""
+        rule = {
+            "implementations": {
+                "partial": {"axe-core": [{"id": "rule-p"}]},
+            }
+        }
+        result = sync_data._extract_implementations(rule)
+        self.assertEqual(result["consistency"].get("rule-p"), "partial")
+
+    def test_list_format_consistency_field(self):
+        """Consistency field on flat-list entries is captured."""
+        rule = {
+            "implementations": [
+                {"technology": "axe-core", "rule": "image-alt", "consistency": "partial"},
+            ]
+        }
+        result = sync_data._extract_implementations(rule)
+        self.assertEqual(result["consistency"].get("image-alt"), "partial")
+
+    def test_list_format_no_consistency_field(self):
+        """Absence of consistency field results in empty consistency map."""
+        rule = {
+            "implementations": [
+                {"technology": "axe-core", "rule": "image-alt"},
+            ]
+        }
+        result = sync_data._extract_implementations(rule)
+        self.assertNotIn("image-alt", result["consistency"])
+
+    def test_consistency_key_always_present(self):
+        """The consistency key is always returned, even when empty."""
+        result = sync_data._extract_implementations({})
+        self.assertIn("consistency", result)
+        self.assertIsInstance(result["consistency"], dict)
+
+
+# ===========================================================================
+# _consistency_rank
+# ===========================================================================
+
+class TestConsistencyRank(unittest.TestCase):
+    """_consistency_rank returns correct numeric ranks."""
+
+    def test_consistent_highest(self):
+        self.assertGreater(
+            sync_data._consistency_rank("consistent"),
+            sync_data._consistency_rank("partial"),
+        )
+
+    def test_partial_above_incorrect(self):
+        self.assertGreater(
+            sync_data._consistency_rank("partial"),
+            sync_data._consistency_rank("incorrect"),
+        )
+
+    def test_unknown_level_lowest(self):
+        self.assertLess(sync_data._consistency_rank(""), sync_data._consistency_rank("incorrect"))
+        self.assertLess(sync_data._consistency_rank("not-checked"), sync_data._consistency_rank("incorrect"))
+
+    def test_case_insensitive(self):
+        self.assertEqual(
+            sync_data._consistency_rank("Consistent"),
+            sync_data._consistency_rank("consistent"),
+        )
+
+
+# ===========================================================================
+# _earl_outcome_to_consistency
+# ===========================================================================
+
+class TestEarlOutcomeToConsistency(unittest.TestCase):
+    """_earl_outcome_to_consistency maps EARL outcomes to consistency levels."""
+
+    def test_passed_to_consistent(self):
+        self.assertEqual(
+            sync_data._earl_outcome_to_consistency({"@id": "earl:passed"}),
+            "consistent",
+        )
+
+    def test_failed_to_incorrect(self):
+        self.assertEqual(
+            sync_data._earl_outcome_to_consistency({"@id": "earl:failed"}),
+            "incorrect",
+        )
+
+    def test_canttell_to_partial(self):
+        self.assertEqual(
+            sync_data._earl_outcome_to_consistency({"@id": "earl:cantTell"}),
+            "partial",
+        )
+
+    def test_plain_string_passed(self):
+        self.assertEqual(sync_data._earl_outcome_to_consistency("earl:passed"), "consistent")
+
+    def test_empty_returns_empty(self):
+        self.assertEqual(sync_data._earl_outcome_to_consistency(""), "")
+        self.assertEqual(sync_data._earl_outcome_to_consistency(None), "")
+
 
 # ===========================================================================
 # _extract_act_id_from_url
@@ -895,15 +1022,67 @@ class TestMergeIntoSpine(unittest.TestCase):
     def test_propagates_engine_rules_from_act_implementations(self):
         spine = _make_spine("1.4.3")
         spine["success_criteria"]["1.4.3"]["automation"]["act"] = ["09o5cg"]
-        impl_data = {"09o5cg": {"axe": ["color-contrast"], "alfa": [], "equal_access": [], "qualweb": []}}
+        impl_data = {"09o5cg": {"axe": ["color-contrast"], "alfa": [], "equal_access": [], "qualweb": [], "consistency": {}}}
         sync_data.merge_into_spine(spine, {}, {}, {}, act_implementations=impl_data)
         self.assertIn("color-contrast", spine["success_criteria"]["1.4.3"]["automation"]["axe"])
 
     def test_act_implementations_stored_in_meta(self):
         spine = _make_spine("1.4.3")
-        impl_data = {"09o5cg": {"axe": ["color-contrast"], "alfa": [], "equal_access": [], "qualweb": []}}
+        impl_data = {"09o5cg": {"axe": ["color-contrast"], "alfa": [], "equal_access": [], "qualweb": [], "consistency": {}}}
         sync_data.merge_into_spine(spine, {}, {}, {}, act_implementations=impl_data)
         self.assertIn("09o5cg", spine["meta"]["act_implementations"])
+
+    def test_consistency_stored_in_meta(self):
+        """Consistency map is preserved when written to meta.act_implementations."""
+        spine = _make_spine("1.4.3")
+        impl_data = {
+            "09o5cg": {
+                "axe": ["color-contrast"],
+                "alfa": [],
+                "equal_access": [],
+                "qualweb": [],
+                "consistency": {"color-contrast": "consistent"},
+            }
+        }
+        sync_data.merge_into_spine(spine, {}, {}, {}, act_implementations=impl_data)
+        stored = spine["meta"]["act_implementations"]["09o5cg"]
+        self.assertEqual(stored["consistency"]["color-contrast"], "consistent")
+
+    def test_consistency_merge_best_wins(self):
+        """When merging two impl dicts for same ACT rule, best consistency wins."""
+        spine = _make_spine("1.4.3")
+        spine["meta"]["act_implementations"] = {
+            "09o5cg": {
+                "axe": ["color-contrast"],
+                "alfa": [],
+                "equal_access": [],
+                "qualweb": [],
+                "consistency": {"color-contrast": "partial"},
+            }
+        }
+        # Fresh data says color-contrast is consistent — should win.
+        impl_data = {
+            "09o5cg": {
+                "axe": ["color-contrast"],
+                "alfa": [],
+                "equal_access": [],
+                "qualweb": [],
+                "consistency": {"color-contrast": "consistent"},
+            }
+        }
+        sync_data.merge_into_spine(spine, {}, {}, {}, act_implementations=impl_data)
+        stored = spine["meta"]["act_implementations"]["09o5cg"]
+        self.assertEqual(stored["consistency"]["color-contrast"], "consistent")
+
+    def test_impl_without_consistency_key_still_works(self):
+        """Impl dicts without a consistency key (e.g. old seed data) are handled gracefully."""
+        spine = _make_spine("1.4.3")
+        impl_data = {"09o5cg": {"axe": ["color-contrast"], "alfa": [], "equal_access": [], "qualweb": []}}
+        # Should not raise even though consistency key is absent.
+        sync_data.merge_into_spine(spine, {}, {}, {}, act_implementations=impl_data)
+        stored = spine["meta"]["act_implementations"]["09o5cg"]
+        self.assertIn("consistency", stored)
+        self.assertIsInstance(stored["consistency"], dict)
 
     def test_no_duplicate_arrm_task_ids(self):
         spine = _make_spine("1.4.3")

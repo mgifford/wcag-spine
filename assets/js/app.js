@@ -561,6 +561,39 @@ function buildCard(num, entry) {
     return `<span class="fpc-badge fpc-badge-${escapeAttr(code)}" title="${escapeAttr(info.title)}" aria-label="${escapeAttr(info.title)}">${info.icon ?? ""}${escapeHTML(info.label)}</span>`;
   }).join("");
 
+  // Render the automation left panel: ACT rules in their own sub-section,
+  // engine-specific rules (axe, Alfa) in a separate sub-section below.
+  const actSection = actIds.length === 0
+    ? `<div class="auto-sub-section">
+         <span class="auto-sub-label">ACT Rules</span>
+         <p class="no-data no-data-sm">None mapped — <a href="https://www.w3.org/WAI/standards-guidelines/act/rules/" target="_blank" rel="noopener noreferrer">browse ACT rules</a></p>
+       </div>`
+    : `<div class="auto-sub-section">
+         <span class="auto-sub-label">ACT Rules</span>
+         <ul class="tag-list" aria-label="W3C ACT rule IDs">
+           ${actIds.map(id =>
+             `<li><a class="tag tag-act" href="https://www.w3.org/WAI/standards-guidelines/act/rules/${encodeURIComponent(id)}/" target="_blank" rel="noopener noreferrer" title="ACT Rule ${escapeHTML(id)}">ACT:${escapeHTML(id)}</a></li>`
+           ).join("")}
+         </ul>
+       </div>`;
+
+  const engineSection = axeIds.length + alfaIds.length === 0
+    ? `<div class="auto-sub-section">
+         <span class="auto-sub-label">Engine Rules</span>
+         <p class="no-data no-data-sm">No engine rules mapped</p>
+       </div>`
+    : `<div class="auto-sub-section">
+         <span class="auto-sub-label">Engine Rules</span>
+         <ul class="tag-list" aria-label="Engine rule IDs">
+           ${axeIds.map(id =>
+             `<li><a class="tag tag-axe" href="${axeRuleUrl(id)}" target="_blank" rel="noopener noreferrer" title="Axe rule ${escapeHTML(id)}">axe:${escapeHTML(id)}</a></li>`
+           ).join("")}
+           ${alfaIds.map(id =>
+             `<li><a class="tag tag-alfa" href="${alfaRuleUrl(id)}" target="_blank" rel="noopener noreferrer" title="Alfa rule ${escapeHTML(id)}">${escapeHTML(id)}</a></li>`
+           ).join("")}
+         </ul>
+       </div>`;
+
   card.innerHTML = `
     <header class="sc-card-header">
       <span class="sc-number" aria-label="Success Criterion ${num}">${num}</span>
@@ -585,31 +618,17 @@ function buildCard(num, entry) {
     <div class="sc-card-body">
       <div class="sc-col col-auto">
         <div class="col-header">
-          🤖 Automated Rules
+          🤖 Automation
           ${renderSourceBadge("W3C / Tools")}
         </div>
-        ${actIds.length + axeIds.length + alfaIds.length === 0
-          ? `<p class="no-data">No automated rules mapped</p>`
-          : `
-            <ul class="tag-list" aria-label="Automated rule IDs">
-              ${actIds.map(id =>
-                `<li><a class="tag tag-act" href="https://www.w3.org/WAI/standards-guidelines/act/rules/${encodeURIComponent(id)}/" target="_blank" rel="noopener noreferrer" title="ACT Rule ${escapeHTML(id)}">ACT:${escapeHTML(id)}</a></li>`
-              ).join("")}
-              ${axeIds.map(id =>
-                `<li><a class="tag tag-axe" href="${axeRuleUrl(id)}" target="_blank" rel="noopener noreferrer" title="Axe rule ${escapeHTML(id)}">axe:${escapeHTML(id)}</a></li>`
-              ).join("")}
-              ${alfaIds.map(id =>
-                `<li><a class="tag tag-alfa" href="${alfaRuleUrl(id)}" target="_blank" rel="noopener noreferrer" title="Alfa rule ${escapeHTML(id)}">${escapeHTML(id)}</a></li>`
-              ).join("")}
-            </ul>
-            <div class="coverage-bar" aria-label="Automation coverage: ${automationCount(entry)} of 3 rule engines">
-              <div class="coverage-track">
-                <div class="coverage-fill" style="width:${Math.round(automationCount(entry) / 3 * 100)}%"></div>
-              </div>
-              <span>${automationCount(entry)}/3</span>
-            </div>
-          `
-        }
+        ${actSection}
+        ${engineSection}
+        <div class="coverage-bar" aria-label="Automation coverage: ${automationCount(entry)} of 3 rule engines">
+          <div class="coverage-track">
+            <div class="coverage-fill" style="width:${Math.round(automationCount(entry) / 3 * 100)}%"></div>
+          </div>
+          <span>${automationCount(entry)}/3</span>
+        </div>
       </div>
       <div class="sc-col col-manual">
         <div class="col-header">
@@ -682,7 +701,7 @@ function renderTable() {
     const alfaLinks = (a.alfa ?? []).map(i =>
       `<a href="${alfaRuleUrl(i)}" target="_blank" rel="noopener noreferrer" title="Alfa rule ${escapeHTML(i)}">${escapeHTML(i)}</a>`
     );
-    const allRuleLinks = [...actLinks, ...axeLinks, ...alfaLinks];
+    const engineLinks = [...axeLinks, ...alfaLinks];
 
     // Roles with optional links to ARRM role pages
     const roleLinks = (e.manual?.roles ?? []).map(r => {
@@ -721,7 +740,8 @@ function renderTable() {
         <td><a href="${escapeAttr(e.url ?? "#")}" target="_blank" rel="noopener noreferrer">${escapeHTML(e.title)}</a></td>
         <td><span class="level-badge level-${escapeHTML(e.level)}">${escapeHTML(e.level)}</span></td>
         <td>${escapeHTML(e.principle ?? "")}</td>
-        <td>${allRuleLinks.length ? allRuleLinks.join(", ") : '<span class="no-data">—</span>'}</td>
+        <td>${actLinks.length ? actLinks.join(", ") : '<span class="no-data">—</span>'}</td>
+        <td>${engineLinks.length ? engineLinks.join(", ") : '<span class="no-data">—</span>'}</td>
         <td>${roleLinks.length ? roleLinks.join(", ") : '<span class="no-data">—</span>'}</td>
         <td>${ttStepLinks.length ? ttStepLinks.join(", ") : '<span class="no-data">—</span>'}</td>
         <td>${arrmTaskLinks.length ? arrmTaskLinks.join(", ") : '<span class="no-data">—</span>'}</td>
@@ -738,7 +758,8 @@ function renderTable() {
           <th scope="col">Title</th>
           <th scope="col">Level</th>
           <th scope="col">Principle</th>
-          <th scope="col">Automated Rules</th>
+          <th scope="col">ACT Rules</th>
+          <th scope="col">Engine Rules</th>
           <th scope="col">Roles</th>
           <th scope="col"><a href="https://section508coordinators.github.io/TrustedTester/index.html" target="_blank" rel="noopener noreferrer" style="color:#fff">Trusted Tester</a></th>
           <th scope="col">ARRM Tasks</th>
@@ -864,6 +885,8 @@ function renderActRules() {
       const alfaRules  = impl.alfa        ?? [];
       const eaRules    = impl.equal_access ?? [];
       const qwRules    = impl.qualweb     ?? [];
+      // consistencyMap: { ruleId → "consistent" | "partial" | "incorrect" }
+      const consistencyMap = impl.consistency ?? {};
 
       const hasAnyImpl = axeRules.length + alfaRules.length + eaRules.length + qwRules.length > 0;
 
@@ -882,27 +905,45 @@ function renderActRules() {
         })
         .join("");
 
+      /**
+       * Render a consistency badge for a single engine rule ID.
+       * Returns an empty string when no consistency data is available.
+       */
+      const consistencyBadge = (ruleId) => {
+        const level = consistencyMap[ruleId];
+        if (!level) return "";
+        const labels = { consistent: "✓ consistent", partial: "~ partial", incorrect: "✗ incorrect" };
+        const titles = {
+          consistent: "Consistently implements this ACT rule",
+          partial:    "Partial implementation of this ACT rule",
+          incorrect:  "Incorrect or non-conformant implementation of this ACT rule",
+        };
+        const label = labels[level] ?? level;
+        const title = titles[level] ?? level;
+        return `<span class="act-consistency-badge act-consistency-${escapeAttr(level)}" title="${escapeAttr(title)}" aria-label="${escapeAttr(title)}">${escapeHTML(label)}</span>`;
+      };
+
       const engineRows = hasAnyImpl ? `
         <dl class="act-impl-list">
           ${axeRules.length ? `
             <dt class="act-engine act-engine-axe">axe-core</dt>
             <dd>${axeRules.map(r =>
-              `<a class="tag tag-axe" href="${axeRuleUrl(r)}" target="_blank" rel="noopener noreferrer" title="Axe rule ${escapeHTML(r)}">${escapeHTML(r)}</a>`
+              `<span class="act-impl-rule"><a class="tag tag-axe" href="${axeRuleUrl(r)}" target="_blank" rel="noopener noreferrer" title="Axe rule ${escapeHTML(r)}">${escapeHTML(r)}</a>${consistencyBadge(r)}</span>`
             ).join(" ")}</dd>` : ""}
           ${alfaRules.length ? `
             <dt class="act-engine act-engine-alfa">Alfa</dt>
             <dd>${alfaRules.map(r =>
-              `<a class="tag tag-alfa" href="${alfaRuleUrl(r)}" target="_blank" rel="noopener noreferrer" title="Alfa rule ${escapeHTML(r)}">${escapeHTML(r)}</a>`
+              `<span class="act-impl-rule"><a class="tag tag-alfa" href="${alfaRuleUrl(r)}" target="_blank" rel="noopener noreferrer" title="Alfa rule ${escapeHTML(r)}">${escapeHTML(r)}</a>${consistencyBadge(r)}</span>`
             ).join(" ")}</dd>` : ""}
           ${eaRules.length ? `
             <dt class="act-engine act-engine-ea">Equal Access</dt>
             <dd>${eaRules.map(r =>
-              `<a class="tag tag-ea" href="https://www.ibm.com/able/requirements/checker-rule-sets" target="_blank" rel="noopener noreferrer" title="Equal Access rule ${escapeHTML(r)}">${escapeHTML(r)}</a>`
+              `<span class="act-impl-rule"><a class="tag tag-ea" href="https://www.ibm.com/able/requirements/checker-rule-sets" target="_blank" rel="noopener noreferrer" title="Equal Access rule ${escapeHTML(r)}">${escapeHTML(r)}</a>${consistencyBadge(r)}</span>`
             ).join(" ")}</dd>` : ""}
           ${qwRules.length ? `
             <dt class="act-engine act-engine-qw">QualWeb</dt>
             <dd>${qwRules.map(r =>
-              `<a class="tag tag-qw" href="https://qualweb.di.fc.ul.pt/evaluator" target="_blank" rel="noopener noreferrer" title="QualWeb rule ${escapeHTML(r)}">${escapeHTML(r)}</a>`
+              `<span class="act-impl-rule"><a class="tag tag-qw" href="https://qualweb.di.fc.ul.pt/evaluator" target="_blank" rel="noopener noreferrer" title="QualWeb rule ${escapeHTML(r)}">${escapeHTML(r)}</a>${consistencyBadge(r)}</span>`
             ).join(" ")}</dd>` : ""}
         </dl>` : `<p class="no-data act-no-impl">No engine implementation data. Run sync to fetch mappings.</p>`;
 
