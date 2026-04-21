@@ -536,7 +536,7 @@ def _extract_implementations(rule: dict) -> dict:
         """Keep the best (highest-ranked) consistency level per rule ID."""
         if not rule_id or not level:
             return
-        level_lo = level.lower()
+        level_lo = str(level).lower()
         current = consistency_map.get(rule_id)
         if current is None or _consistency_rank(level_lo) > _consistency_rank(current):
             consistency_map[rule_id] = level_lo

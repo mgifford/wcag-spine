@@ -885,8 +885,8 @@ function renderActRules() {
       const alfaRules  = impl.alfa        ?? [];
       const eaRules    = impl.equal_access ?? [];
       const qwRules    = impl.qualweb     ?? [];
-      // consistency: { ruleId → "consistent" | "partial" | "incorrect" }
-      const consistency = impl.consistency ?? {};
+      // consistencyMap: { ruleId → "consistent" | "partial" | "incorrect" }
+      const consistencyMap = impl.consistency ?? {};
 
       const hasAnyImpl = axeRules.length + alfaRules.length + eaRules.length + qwRules.length > 0;
 
@@ -910,7 +910,7 @@ function renderActRules() {
        * Returns an empty string when no consistency data is available.
        */
       const consistencyBadge = (ruleId) => {
-        const level = consistency[ruleId];
+        const level = consistencyMap[ruleId];
         if (!level) return "";
         const labels = { consistent: "✓ consistent", partial: "~ partial", incorrect: "✗ incorrect" };
         const titles = {
