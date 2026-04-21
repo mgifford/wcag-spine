@@ -266,9 +266,60 @@ OUTPUT_FILE = DATA_DIR / "master_spine.json"
 IMPL_ENGINES: tuple[str, ...] = ("axe", "alfa", "equal_access", "qualweb")
 
 
-def _empty_impl() -> dict[str, list[str]]:
-    """Return a fresh empty implementation dict for one ACT rule."""
-    return {engine: [] for engine in IMPL_ENGINES}
+def _empty_impl() -> dict:
+    """Return a fresh empty implementation dict for one ACT rule.
+
+    The ``consistency`` key holds a mapping of individual engine rule IDs to
+    their best-known ACT consistency level (``"consistent"``, ``"partial"``,
+    or ``"incorrect"``).  It is distinct from the per-engine list keys so that
+    callers can still iterate ``IMPL_ENGINES`` for rule-ID lists without
+    special-casing this key.
+    """
+    d: dict = {engine: [] for engine in IMPL_ENGINES}
+    d["consistency"] = {}
+    return d
+
+
+# Canonical ranking for ACT consistency levels — higher is better.
+_CONSISTENCY_RANK: dict[str, int] = {
+    "consistent": 2,
+    "partial":    1,
+    "incorrect":  0,
+}
+
+
+def _consistency_rank(level: str) -> int:
+    """Return a numeric rank for a consistency level string (higher = better).
+
+    Unknown levels (empty string, ``"not-checked"``, etc.) return ``-1`` so
+    that any known level will replace them during a best-wins merge.
+    """
+    return _CONSISTENCY_RANK.get(level.lower() if level else "", -1)
+
+
+def _earl_outcome_to_consistency(outcome_val: object) -> str:
+    """Convert an EARL outcome value to a consistency level string.
+
+    EARL implementation reports use:
+      * ``earl:passed``   → ``"consistent"``
+      * ``earl:failed``   → ``"incorrect"``
+      * ``earl:cantTell`` → ``"partial"``
+
+    The value may arrive as a plain string or a JSON-LD ``{"@id": "..."}``
+    dict.  Returns an empty string when the outcome cannot be mapped.
+    """
+    if isinstance(outcome_val, dict):
+        raw = outcome_val.get("@id") or outcome_val.get("id") or ""
+    else:
+        raw = str(outcome_val) if outcome_val else ""
+    raw = raw.lower()
+    if "passed" in raw:
+        return "consistent"
+    if "canttell" in raw or "cant_tell" in raw:
+        return "partial"
+    if "failed" in raw:
+        return "incorrect"
+    return ""
 
 
 # ---------------------------------------------------------------------------
@@ -458,7 +509,7 @@ def _extract_rule_ids(items: object) -> list[str]:
     return result
 
 
-def _extract_implementations(rule: dict) -> dict[str, list[str]]:
+def _extract_implementations(rule: dict) -> dict:
     """
     Extract per-engine implementation rule IDs from an ACT rule dict.
 
@@ -471,28 +522,46 @@ def _extract_implementations(rule: dict) -> dict[str, list[str]]:
          ``[{"technology": "axe-core", "rule": "image-alt"}, ...]``
 
     Returns a dict with keys ``axe``, ``alfa``, ``equal_access``, ``qualweb``
-    mapping to sorted, deduplicated lists of rule ID strings.
+    mapping to sorted, deduplicated lists of rule ID strings, plus a
+    ``consistency`` key that maps each engine rule ID to its best-known ACT
+    consistency level (``"consistent"``, ``"partial"``, or ``"incorrect"``).
     """
     axe_rules: list[str] = []
     alfa_rules: list[str] = []
     equal_access_rules: list[str] = []
     qualweb_rules: list[str] = []
+    consistency_map: dict[str, str] = {}
+
+    def _record(rule_id: str, level: str) -> None:
+        """Keep the best (highest-ranked) consistency level per rule ID."""
+        if not rule_id or not level:
+            return
+        level_lo = level.lower()
+        current = consistency_map.get(rule_id)
+        if current is None or _consistency_rank(level_lo) > _consistency_rank(current):
+            consistency_map[rule_id] = level_lo
 
     implementations = rule.get("implementations", {})
 
     if isinstance(implementations, dict):
         # Format 1: keyed by consistency level
-        for tools in implementations.values():
+        for level, tools in implementations.items():
             if not isinstance(tools, dict):
                 continue
-            axe_rules.extend(_extract_rule_ids(tools.get("axe-core") or tools.get("axe") or []))
-            alfa_rules.extend(_extract_rule_ids(tools.get("Alfa") or tools.get("alfa") or []))
-            equal_access_rules.extend(
-                _extract_rule_ids(tools.get("Equal Access") or tools.get("equal_access") or [])
-            )
-            qualweb_rules.extend(
-                _extract_rule_ids(tools.get("QualWeb") or tools.get("qualweb") or [])
-            )
+            for rid in _extract_rule_ids(tools.get("axe-core") or tools.get("axe") or []):
+                axe_rules.append(rid)
+                _record(rid, level)
+            for rid in _extract_rule_ids(tools.get("Alfa") or tools.get("alfa") or []):
+                alfa_rules.append(rid)
+                _record(rid, level)
+            for rid in _extract_rule_ids(
+                tools.get("Equal Access") or tools.get("equal_access") or []
+            ):
+                equal_access_rules.append(rid)
+                _record(rid, level)
+            for rid in _extract_rule_ids(tools.get("QualWeb") or tools.get("qualweb") or []):
+                qualweb_rules.append(rid)
+                _record(rid, level)
     elif isinstance(implementations, list):
         # Format 2: flat list of tool entries
         for impl in implementations:
@@ -505,20 +574,27 @@ def _extract_implementations(rule: dict) -> dict[str, list[str]]:
             )
             if not rule_id:
                 continue
+            consistency = (impl.get("consistency") or "").lower()
+            rule_id = str(rule_id)
             if "axe" in tech:
-                axe_rules.append(str(rule_id))
+                axe_rules.append(rule_id)
+                _record(rule_id, consistency)
             elif "alfa" in tech:
-                alfa_rules.append(str(rule_id))
+                alfa_rules.append(rule_id)
+                _record(rule_id, consistency)
             elif "equal" in tech or "ibm" in tech:
-                equal_access_rules.append(str(rule_id))
+                equal_access_rules.append(rule_id)
+                _record(rule_id, consistency)
             elif "qualweb" in tech:
-                qualweb_rules.append(str(rule_id))
+                qualweb_rules.append(rule_id)
+                _record(rule_id, consistency)
 
     return {
         "axe": sorted(set(axe_rules)),
         "alfa": sorted(set(alfa_rules)),
         "equal_access": sorted(set(equal_access_rules)),
         "qualweb": sorted(set(qualweb_rules)),
+        "consistency": consistency_map,
     }
 
 
@@ -754,6 +830,18 @@ def fetch_earl_alfa_mappings(
         if not alfa_id:
             continue
 
+        # --- Extract consistency from the EARL result outcome ---
+        result_val = (
+            assertion.get("earl:result")
+            or assertion.get("result")
+            or {}
+        )
+        if isinstance(result_val, dict):
+            outcome_val = result_val.get("earl:outcome") or result_val.get("outcome") or ""
+        else:
+            outcome_val = str(result_val)
+        consistency = _earl_outcome_to_consistency(outcome_val)
+
         # --- Map Alfa rule to each WCAG SC covered by this ACT rule ---
         scs_for_act = act_to_scs.get(act_id, [])
         for sc in scs_for_act:
@@ -761,10 +849,14 @@ def fetch_earl_alfa_mappings(
             if alfa_id not in lst:
                 lst.append(alfa_id)
 
-        # --- Record the Alfa rule in act_impl_updates ---
+        # --- Record the Alfa rule and its consistency in act_impl_updates ---
         entry = act_impl_updates.setdefault(act_id, _empty_impl())
         if alfa_id not in entry["alfa"]:
             entry["alfa"].append(alfa_id)
+        if consistency:
+            old = entry["consistency"].get(alfa_id, "")
+            if not old or _consistency_rank(consistency) > _consistency_rank(old):
+                entry["consistency"][alfa_id] = consistency
 
         processed += 1
 
@@ -1184,16 +1276,25 @@ def merge_into_spine(
     combined_impl: dict[str, dict] = {}
     seed_impl = spine.get("meta", {}).get("act_implementations", {})
     for act_id, impl in seed_impl.items():
-        combined_impl[act_id] = {k: list(v) for k, v in impl.items()}
+        # Copy engine-rule lists; copy the consistency dict separately so that
+        # the generic `list(v)` loop doesn't corrupt the dict-valued key.
+        combined_impl[act_id] = {k: list(v) for k, v in impl.items() if k != "consistency"}
+        combined_impl[act_id]["consistency"] = dict(impl.get("consistency", {}))
     for act_id, impl in (act_implementations or {}).items():
         if act_id not in combined_impl:
-            combined_impl[act_id] = {k: list(v) for k, v in impl.items()}
+            combined_impl[act_id] = {k: list(v) for k, v in impl.items() if k != "consistency"}
+            combined_impl[act_id]["consistency"] = dict(impl.get("consistency", {}))
         else:
             for engine in ("axe", "alfa", "equal_access", "qualweb"):
                 merged = list(dict.fromkeys(
                     combined_impl[act_id].get(engine, []) + impl.get(engine, [])
                 ))
                 combined_impl[act_id][engine] = merged
+            # Merge consistency maps: keep the best (highest-ranked) level per rule ID.
+            old_cons = combined_impl[act_id].setdefault("consistency", {})
+            for rid, level in impl.get("consistency", {}).items():
+                if rid not in old_cons or _consistency_rank(level) > _consistency_rank(old_cons[rid]):
+                    old_cons[rid] = level
 
     for sc_num, entry in sc_dict.items():
         # --- ACT ---

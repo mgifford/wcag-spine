@@ -27,7 +27,8 @@
         "equal_access": [],
         "qualweb": [
           "QW-ACT-R27"
-        ]
+        ],
+        "consistency": {}
       },
       "3ea0c8": {
         "axe": [
@@ -39,13 +40,15 @@
         "equal_access": [],
         "qualweb": [
           "QW-ACT-R2"
-        ]
+        ],
+        "consistency": {}
       },
       "59796f": {
         "axe": [],
         "alfa": [],
         "equal_access": [],
-        "qualweb": []
+        "qualweb": [],
+        "consistency": {}
       },
       "cae760": {
         "axe": [
@@ -55,7 +58,8 @@
           "SIA-R2"
         ],
         "equal_access": [],
-        "qualweb": []
+        "qualweb": [],
+        "consistency": {}
       },
       "b5c3f8": {
         "axe": [
@@ -67,7 +71,8 @@
         "equal_access": [],
         "qualweb": [
           "QW-ACT-R3"
-        ]
+        ],
+        "consistency": {}
       },
       "5b7ae0": {
         "axe": [
@@ -77,7 +82,8 @@
           "SIA-R5"
         ],
         "equal_access": [],
-        "qualweb": []
+        "qualweb": [],
+        "consistency": {}
       },
       "bf051a": {
         "axe": [
@@ -89,7 +95,8 @@
         "equal_access": [],
         "qualweb": [
           "QW-ACT-R1"
-        ]
+        ],
+        "consistency": {}
       },
       "2779a5": {
         "axe": [
@@ -97,7 +104,8 @@
         ],
         "alfa": [],
         "equal_access": [],
-        "qualweb": []
+        "qualweb": [],
+        "consistency": {}
       },
       "e086e5": {
         "axe": [
@@ -109,13 +117,15 @@
         "equal_access": [],
         "qualweb": [
           "QW-ACT-R4"
-        ]
+        ],
+        "consistency": {}
       },
       "cc0f0a": {
         "axe": [],
         "alfa": [],
         "equal_access": [],
-        "qualweb": []
+        "qualweb": [],
+        "consistency": {}
       },
       "09o5cg": {
         "axe": [
@@ -126,7 +136,8 @@
           "SIA-R69"
         ],
         "equal_access": [],
-        "qualweb": []
+        "qualweb": [],
+        "consistency": {}
       },
       "afw4f7": {
         "axe": [
@@ -136,7 +147,8 @@
           "SIA-R69"
         ],
         "equal_access": [],
-        "qualweb": []
+        "qualweb": [],
+        "consistency": {}
       }
     },
     "alfa_version": "0.114.3",

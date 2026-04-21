@@ -602,6 +602,32 @@ main {
 .tag-axe  { background: var(--color-AA-bg); color: var(--color-AA); border: 1px solid #90caf9; }
 .tag-alfa { background: var(--color-A-bg); color: var(--color-A); border: 1px solid #a5d6a7; }
 
+/* ----- Automation column sub-sections (Cards view) ---------- */
+
+.auto-sub-section {
+  margin-top: 8px;
+}
+
+.auto-sub-section + .auto-sub-section {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--color-border);
+}
+
+.auto-sub-label {
+  display: block;
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-muted);
+  margin-bottom: 4px;
+}
+
+.no-data-sm {
+  font-size: 0.78rem;
+}
+
 /* ----- FPC (Functional Performance Criteria) badges --------- */
 
 .fpc-section {
@@ -1154,6 +1180,45 @@ main {
 .tag-ea { background: #fff3e0; color: #7a2b00; border: 1px solid #ffb74d; }
 .tag-qw { background: var(--color-A-bg); color: var(--color-A); border: 1px solid #a5d6a7; }
 
+/* ----- ACT implementation rule + consistency badge ---------- */
+
+/* Wrapper that groups an engine rule tag with its consistency badge inline */
+.act-impl-rule {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: nowrap;
+}
+
+/* Base consistency badge */
+.act-consistency-badge {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 20px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  white-space: nowrap;
+  letter-spacing: 0.2px;
+}
+
+.act-consistency-consistent {
+  background: #e8f5e9;
+  color: #1b5e20;
+  border: 1px solid #a5d6a7;
+}
+
+.act-consistency-partial {
+  background: #fff8e1;
+  color: #5d3a00;
+  border: 1px solid #ffe082;
+}
+
+.act-consistency-incorrect {
+  background: #ffebee;
+  color: #b71c1c;
+  border: 1px solid #ef9a9a;
+}
+
 /* Dark mode overrides for ACT view */
 
 @media (prefers-color-scheme: dark) {
@@ -1167,6 +1232,10 @@ main {
   .act-sc-badge:hover { background: #1e3a5f; }
   .tag-ea { background: #1a1000; color: #ffb74d; border-color: #bf8a00; }
   .tag-qw { background: #001a00; color: #66bb6a; border-color: #1b5e20; }
+  .act-consistency-consistent { background: #0d2a0d; color: #a5d6a7; border-color: #2e7d32; }
+  .act-consistency-partial    { background: #2d1e00; color: #ffe082; border-color: #f9a825; }
+  .act-consistency-incorrect  { background: #3d0000; color: #ef9a9a; border-color: #c62828; }
+  .auto-sub-section + .auto-sub-section { border-top-color: #333; }
 }
 
 /* ----- Coverage view --------------------------------------- */
