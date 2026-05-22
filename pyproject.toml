@@ -1,0 +1,14 @@
+[project]
+name = "wcag-spine"
+version = "0.1.0"
+description = "WCAG Spine dashboard data sync and validation tooling"
+requires-python = ">=3.12"
+dependencies = []
+
+[dependency-groups]
+dev = [
+  "pytest>=8.0",
+]
+
+[tool.uv]
+package = false

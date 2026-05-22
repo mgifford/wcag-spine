@@ -90,7 +90,8 @@ wcag-spine/
 ├── .github/
 │   └── workflows/
 │       └── sync_accessibility.yml      # Daily sync + GitHub Pages deploy
-└── requirements.txt
+├── pyproject.toml                       # Python project metadata + dev dependencies (uv)
+└── requirements.txt                     # Legacy pip-compatible dev dependency list
 ```
 
 
@@ -114,8 +115,11 @@ wcag-spine/
 ## Running the Sync Script Locally <a href="#running-the-sync-script-locally" aria-label="Link to Running the Sync Script Locally section">#</a>
 
 ```bash
-# No third-party dependencies — uses only the Python standard library
-python scripts/sync_data.py
+# Install Python tooling (pytest, etc.) with uv
+uv sync --group dev
+
+# No third-party runtime dependencies — sync_data.py uses only the Python standard library
+uv run python scripts/sync_data.py
 ```
 
 The script:
@@ -207,7 +211,7 @@ To answer the natural question *"which parts of this project are AI-generated?"*
 
 The following safeguards are in place for AI-generated code:
 
-- **Automated CI** runs on every commit: Playwright + Axe-core (0 violations required), Lighthouse CI (100% accessibility score required), and Python unit tests (`python3 -m pytest`).
+- **Automated CI** runs on every commit: Playwright + Axe-core (0 violations required), Lighthouse CI (100% accessibility score required), and Python unit tests (`uv run python -m pytest` / `python3 -m pytest`).
 - **Daily data sync** re-runs `sync_data.py` against live W3C/DHS endpoints and redeploys; failures are visible in the [Actions tab](https://github.com/mgifford/wcag-spine/actions).
 - **Maintainer review** — all AI-generated PRs are reviewed by the project maintainer before merging.
 - **Not yet fully audited** — a comprehensive independent human code review of the full codebase has not yet been completed. Contributions and reviews are welcome via the [issue queue](https://github.com/mgifford/wcag-spine/issues).
@@ -219,7 +223,7 @@ The following safeguards are in place for AI-generated code:
 | **GitHub Copilot** (Coding Agent / `copilot-swe-agent`) | Frontend · Data pipeline · Documentation | Code generation, documentation authoring, PR automation, and project scaffolding throughout the build of this project |
 | **Antigravity** (AI Coding Assistant) | Frontend · Data pipeline | Removal of MermaidJS dependency; Implementation of pure HTML/CSS Spine View and data flow visualisations; Implementation of live Trusted Tester v5 scraper and data provenance source badges; Implementation of theme-aware (Light/Dark) accessibility CI/CD pipeline (Playwright + Axe-core + Lighthouse); Remediation of WCAG 2.2 AA violations (contrast, nested interactive, target-size) |
 | **Claude Sonnet** (GitHub Copilot Task Agent / `claude-sonnet-4.5`) | Data pipeline | Fixed false-positive WCAG 3.0 Recommendation check in `scripts/check_updates.py` — added `fetch_content_snippet()` helper and updated `check_wcag30()` to verify "W3C Recommendation" in page content rather than relying solely on HTTP 200; updated unit tests accordingly |
-| **GitHub Copilot Task Agent** | Documentation | Authored `DEFINITION_OF_DONE.md` and updated README cross-references and AI disclosure; no runtime, build, or data-pipeline behavior changed |
+| **GitHub Copilot Task Agent** | Documentation · Build tooling | Authored `DEFINITION_OF_DONE.md`; updated README cross-references and AI disclosure; and migrated Python project management to `uv` via `pyproject.toml` (no runtime data-pipeline logic changes) |
 
 ### Runtime AI
 
