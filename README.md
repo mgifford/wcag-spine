@@ -223,7 +223,7 @@ The following safeguards are in place for AI-generated code:
 | **GitHub Copilot** (Coding Agent / `copilot-swe-agent`) | Frontend · Data pipeline · Documentation | Code generation, documentation authoring, PR automation, and project scaffolding throughout the build of this project |
 | **Antigravity** (AI Coding Assistant) | Frontend · Data pipeline | Removal of MermaidJS dependency; Implementation of pure HTML/CSS Spine View and data flow visualisations; Implementation of live Trusted Tester v5 scraper and data provenance source badges; Implementation of theme-aware (Light/Dark) accessibility CI/CD pipeline (Playwright + Axe-core + Lighthouse); Remediation of WCAG 2.2 AA violations (contrast, nested interactive, target-size) |
 | **Claude Sonnet** (GitHub Copilot Task Agent / `claude-sonnet-4.5`) | Data pipeline | Fixed false-positive WCAG 3.0 Recommendation check in `scripts/check_updates.py` — added `fetch_content_snippet()` helper and updated `check_wcag30()` to verify "W3C Recommendation" in page content rather than relying solely on HTTP 200; updated unit tests accordingly |
-| **GitHub Copilot Task Agent** | Documentation · Build tooling | Authored `DEFINITION_OF_DONE.md`; updated README cross-references and AI disclosure; and migrated Python project management to `uv` via `pyproject.toml` (no runtime data-pipeline logic changes) |
+| **GitHub Copilot Task Agent** | Documentation · Build tooling · Governance | Authored `DEFINITION_OF_DONE.md`; updated README cross-references and AI disclosure; migrated Python project management to `uv` via `pyproject.toml`; and updated `AGENTS.md` security requirements plus authored `SBOM.md` for dependency/version/license inventory documentation |
 
 ### Runtime AI
 
@@ -243,9 +243,10 @@ load any AI SDK, call any inference endpoint, or delegate any logic to a browser
 | [`testing-methods.md`](testing-methods.md) | Testing methodology, resource links, and coverage gap analysis |
 | [`ACCESSIBILITY.md`](ACCESSIBILITY.md) | Project accessibility commitments |
 | [`DEFINITION_OF_DONE.md`](DEFINITION_OF_DONE.md) | Definition of done checklist for report-quality documentation |
+| [`SBOM.md`](SBOM.md) | Software bill of materials for repository tooling, dependencies, and licenses |
 
 ---
 
 ## License <a href="#license" aria-label="Link to License section">#</a>
 
-[MIT](LICENSE) · Data sourced from W3C (CC BY 4.0) and open-source projects.
+[GNU Affero General Public License v3.0](LICENSE) · Data sourced from W3C (CC BY 4.0) and open-source projects. See [`SBOM.md`](SBOM.md) for component-level version and license details, including manifest metadata that differs from the repository license file.

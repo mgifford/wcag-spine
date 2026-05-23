@@ -38,6 +38,14 @@ This project is a **WCAG data visualisation dashboard** with three key component
 - Color combinations must pass WCAG contrast ratios (4.5:1 min) in both light and dark modes
 - Use semantic HTML, proper ARIA attributes, and keyboard focus management
 
+### Security
+
+- Security is a required quality attribute for every contribution alongside accessibility and data integrity
+- Never commit secrets, tokens, credentials, or other sensitive data to the repository
+- Do not introduce known-vulnerable dependencies, insecure defaults, or unnecessary workflow permissions
+- Treat all externally fetched data as untrusted input and validate or sanitize it before it affects generated artifacts or UI output
+- Keep software inventory and license documentation current by updating `SBOM.md` whenever dependency manifests, workflow versions, or major tooling references change
+
 
 ### Data Integrity
 
@@ -102,7 +110,7 @@ Transparency about AI use is a core commitment of this project. When contributin
 When identifying or reporting issues:
 
 - **Critical:** Dashboard feature prevents users from completing core tasks (blocked navigation, keyboard trap)
-- **High:** Significant accessibility barrier or WCAG data error
+- **High:** Significant accessibility barrier, security vulnerability, or WCAG data error
 - **Medium:** Documentation clarity or incomplete examples
 - **Low:** Minor improvements, typos, enhancements
 
