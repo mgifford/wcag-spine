@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-06-01",
+    "generated": "2026-06-02",
     "wcag_version": "2.2",
     "sources": {
       "act_rules": "https://raw.githubusercontent.com/w3c/wcag-act-rules/main/wcag-mapping.json",
@@ -15,7 +15,7 @@
       "alfa_earl": "https://raw.githubusercontent.com/Siteimprove/alfa-act-r/main/reports/alfa-automated-report.json",
       "fpc_mapping": "https://raw.githubusercontent.com/CivicActions/accessibility-data-reference/main/mapping-wcag-to-fpc.csv"
     },
-    "axe_version": "4.11",
+    "axe_version": "4.12",
     "act_implementations": {
       "23a2a8": {
         "axe": [
