@@ -1,4 +1,4 @@
-name: Monthly Standards Update Check
+name: Weekly Standards Update Check
 
 on:
   schedule:
