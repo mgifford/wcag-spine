@@ -27,7 +27,7 @@
   "homepage": "https://github.com/mgifford/wcag-spine#readme",
   "devDependencies": {
     "@axe-core/playwright": "^4.11.1",
-    "@lhci/cli": "^0.15.1",
+    "@lhci/cli": "^0.16.1",
     "@playwright/test": "^1.59.1",
     "http-server": "^14.1.1"
   }
